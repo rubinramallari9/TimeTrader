@@ -74,39 +74,158 @@ export default function HomePage() {
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#B09145]/30 to-transparent" />
 
         <div className="relative max-w-7xl mx-auto px-4 pt-20 pb-20 md:pt-28 md:pb-28">
-          <div className="max-w-3xl">
-            <p className="tt-section-label text-[#B09145] mb-5">The World&apos;s Finest</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
-            <h1 className="tt-hero-headline text-white text-5xl sm:text-6xl md:text-7xl mb-6 leading-[1.02]">
-              Where Exceptional<br />
-              <span className="text-[#B09145]">Timepieces</span> Find<br />
-              New Wrists
-            </h1>
+            {/* Left — copy */}
+            <div>
+              <p className="tt-section-label text-[#B09145] mb-5">The World&apos;s Finest</p>
 
-            <p className="text-[#9E9585] text-base sm:text-lg max-w-xl mb-10 leading-relaxed">
-              Buy and sell certified pre-owned luxury watches from verified sellers worldwide. Every piece backed by AI authentication.
-            </p>
+              <h1 className="tt-hero-headline text-white text-5xl sm:text-6xl md:text-7xl mb-6 leading-[1.02]">
+                Where Exceptional<br />
+                <span className="text-[#B09145]">Timepieces</span> Find<br />
+                New Wrists
+              </h1>
 
-            <form onSubmit={handleSearch} className="flex gap-2 max-w-xl mb-10">
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search brand, model, reference..."
-                className="flex-1 bg-[#161E2E] border border-[#1E2D40] rounded-xl px-5 py-4 text-sm text-white placeholder-[#4A5568] focus:outline-none focus:ring-2 focus:ring-[#B09145] focus:border-transparent transition-shadow"
-              />
-              <button type="submit" className="tt-btn-gold text-xs py-4 px-7 rounded-xl">
-                Search
-              </button>
-            </form>
+              <p className="text-[#9E9585] text-base sm:text-lg max-w-xl mb-10 leading-relaxed">
+                Buy and sell certified pre-owned luxury watches from verified sellers worldwide. Every piece backed by AI authentication.
+              </p>
 
-            <div className="flex flex-wrap gap-3">
-              <Link href="/listings" className="tt-btn-gold py-3 px-7 rounded-xl text-sm">
-                Browse Watches
-              </Link>
-              <Link href="/sell" className="tt-btn-ghost py-3 px-7 rounded-xl text-sm">
-                List Your Watch
-              </Link>
+              <form onSubmit={handleSearch} className="flex gap-2 max-w-xl mb-10">
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search brand, model, reference..."
+                  className="flex-1 bg-[#161E2E] border border-[#1E2D40] rounded-xl px-5 py-4 text-sm text-white placeholder-[#4A5568] focus:outline-none focus:ring-2 focus:ring-[#B09145] focus:border-transparent transition-shadow"
+                />
+                <button type="submit" className="tt-btn-gold text-xs py-4 px-7 rounded-xl">
+                  Search
+                </button>
+              </form>
+
+              <div className="flex flex-wrap gap-3">
+                <Link href="/listings" className="tt-btn-gold py-3 px-7 rounded-xl text-sm">
+                  Browse Watches
+                </Link>
+                <Link href="/sell" className="tt-btn-ghost py-3 px-7 rounded-xl text-sm">
+                  List Your Watch
+                </Link>
+              </div>
             </div>
+
+            {/* Right — watch silhouette */}
+            <div className="hidden lg:flex items-center justify-center relative">
+              {/* Soft glow behind the watch */}
+              <div className="absolute w-80 h-80 rounded-full bg-[#B09145]/8 blur-3xl" />
+              <svg
+                viewBox="0 0 280 420"
+                className="relative w-72 xl:w-80 drop-shadow-2xl"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {/* ── Strap top ── */}
+                <rect x="100" y="0" width="80" height="90" rx="10" fill="#0A0F1A" stroke="#1E2D40" strokeWidth="1.5"/>
+                {/* strap buckle holes */}
+                <rect x="115" y="15" width="50" height="3" rx="1.5" fill="#1E2D40"/>
+                <rect x="115" y="25" width="50" height="3" rx="1.5" fill="#1E2D40"/>
+                <rect x="115" y="35" width="50" height="3" rx="1.5" fill="#1E2D40"/>
+                <rect x="115" y="45" width="50" height="3" rx="1.5" fill="#1E2D40"/>
+                <rect x="115" y="55" width="50" height="3" rx="1.5" fill="#1E2D40"/>
+                {/* buckle pin */}
+                <circle cx="140" cy="70" r="5" fill="#B09145" opacity="0.8"/>
+                <rect x="138" y="64" width="4" height="12" rx="2" fill="#B09145"/>
+
+                {/* ── Case lugs top ── */}
+                <path d="M95 85 Q85 90 85 100 L85 105 L195 105 L195 100 Q195 90 185 85 Z" fill="#1A2535" stroke="#2A3A50" strokeWidth="1"/>
+
+                {/* ── Watch case (round, outer) ── */}
+                <circle cx="140" cy="210" r="110" fill="#161E2E" stroke="#2A3A50" strokeWidth="2"/>
+                {/* Case bezel */}
+                <circle cx="140" cy="210" r="105" fill="none" stroke="#B09145" strokeWidth="1.5" strokeDasharray="4 3"/>
+                {/* Bezel ring */}
+                <circle cx="140" cy="210" r="100" fill="#0E1520" stroke="#1E2D40" strokeWidth="2"/>
+                {/* Dial ring */}
+                <circle cx="140" cy="210" r="92" fill="#0A1220" stroke="#243040" strokeWidth="1"/>
+
+                {/* ── Dial ── */}
+                <circle cx="140" cy="210" r="88" fill="#0D1828"/>
+
+                {/* Minute markers — 60 ticks */}
+                {Array.from({ length: 60 }).map((_, i) => {
+                  const angle = (i * 6 - 90) * (Math.PI / 180);
+                  const isHour = i % 5 === 0;
+                  const r1 = isHour ? 74 : 79;
+                  const r2 = 85;
+                  const x1 = 140 + r1 * Math.cos(angle);
+                  const y1 = 210 + r1 * Math.sin(angle);
+                  const x2 = 140 + r2 * Math.cos(angle);
+                  const y2 = 210 + r2 * Math.sin(angle);
+                  return (
+                    <line
+                      key={i}
+                      x1={x1} y1={y1} x2={x2} y2={y2}
+                      stroke={isHour ? "#B09145" : "#2A3A50"}
+                      strokeWidth={isHour ? 2 : 0.8}
+                      strokeLinecap="round"
+                    />
+                  );
+                })}
+
+                {/* Hour numerals at 12, 3, 6, 9 */}
+                <text x="140" y="148" textAnchor="middle" fill="#C8A96E" fontSize="10" fontFamily="Georgia, serif" fontWeight="600">12</text>
+                <text x="222" y="214" textAnchor="middle" fill="#C8A96E" fontSize="10" fontFamily="Georgia, serif" fontWeight="600">3</text>
+                <text x="140" y="280" textAnchor="middle" fill="#C8A96E" fontSize="10" fontFamily="Georgia, serif" fontWeight="600">6</text>
+                <text x="58" y="214" textAnchor="middle" fill="#C8A96E" fontSize="10" fontFamily="Georgia, serif" fontWeight="600">9</text>
+
+                {/* Brand name on dial */}
+                <text x="140" y="186" textAnchor="middle" fill="#B09145" fontSize="9" fontFamily="Georgia, serif" fontStyle="italic" letterSpacing="2">TimeTrader</text>
+                <line x1="112" y1="190" x2="168" y2="190" stroke="#B09145" strokeWidth="0.5" opacity="0.5"/>
+
+                {/* Sub-seconds dial at 6 o'clock */}
+                <circle cx="140" cy="248" r="14" fill="#0A1018" stroke="#1E2D40" strokeWidth="1"/>
+                {Array.from({ length: 12 }).map((_, i) => {
+                  const angle = (i * 30 - 90) * (Math.PI / 180);
+                  const x1 = 140 + 10 * Math.cos(angle);
+                  const y1 = 248 + 10 * Math.sin(angle);
+                  const x2 = 140 + 12 * Math.cos(angle);
+                  const y2 = 248 + 12 * Math.sin(angle);
+                  return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#2A3A50" strokeWidth="0.8"/>;
+                })}
+                {/* Sub-seconds hand */}
+                <line x1="140" y1="248" x2="140" y2="238" stroke="#B09145" strokeWidth="1" strokeLinecap="round"/>
+
+                {/* ── Hands ── */}
+                {/* Hour hand — pointing ~10 o'clock */}
+                <line x1="140" y1="210" x2="111" y2="179" stroke="#EDE9E3" strokeWidth="5" strokeLinecap="round"/>
+                {/* Minute hand — pointing ~2 o'clock */}
+                <line x1="140" y1="210" x2="172" y2="162" stroke="#EDE9E3" strokeWidth="3.5" strokeLinecap="round"/>
+                {/* Seconds hand — red accent */}
+                <line x1="140" y1="210" x2="153" y2="148" stroke="#B09145" strokeWidth="1.5" strokeLinecap="round"/>
+                {/* Tail of seconds hand */}
+                <line x1="140" y1="210" x2="130" y2="238" stroke="#B09145" strokeWidth="1.5" strokeLinecap="round"/>
+                {/* Center cap */}
+                <circle cx="140" cy="210" r="5" fill="#B09145"/>
+                <circle cx="140" cy="210" r="2.5" fill="#0E1520"/>
+
+                {/* Crown on right */}
+                <rect x="248" y="203" width="16" height="14" rx="4" fill="#1A2535" stroke="#2A3A50" strokeWidth="1.2"/>
+                <line x1="252" y1="206" x2="260" y2="206" stroke="#B09145" strokeWidth="0.8" opacity="0.6"/>
+                <line x1="252" y1="210" x2="260" y2="210" stroke="#B09145" strokeWidth="0.8" opacity="0.6"/>
+                <line x1="252" y1="214" x2="260" y2="214" stroke="#B09145" strokeWidth="0.8" opacity="0.6"/>
+
+                {/* ── Case lugs bottom ── */}
+                <path d="M95 315 Q85 320 85 330 L85 335 L195 335 L195 330 Q195 320 185 315 Z" fill="#1A2535" stroke="#2A3A50" strokeWidth="1"/>
+
+                {/* ── Strap bottom ── */}
+                <rect x="100" y="330" width="80" height="90" rx="10" fill="#0A0F1A" stroke="#1E2D40" strokeWidth="1.5"/>
+                {/* keeper loop */}
+                <rect x="108" y="358" width="64" height="8" rx="4" fill="none" stroke="#1E2D40" strokeWidth="1.5"/>
+                {/* strap texture */}
+                <rect x="115" y="375" width="50" height="3" rx="1.5" fill="#1E2D40"/>
+                <rect x="115" y="385" width="50" height="3" rx="1.5" fill="#1E2D40"/>
+                <rect x="115" y="395" width="50" height="3" rx="1.5" fill="#1E2D40"/>
+              </svg>
+            </div>
+
           </div>
         </div>
       </section>
