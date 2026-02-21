@@ -39,7 +39,7 @@ export default function StarRating(props: Props) {
         </svg>
       ))}
       {props.count !== undefined && (
-        <span className="text-xs text-gray-500 ml-0.5">({props.count})</span>
+        <span className="text-xs text-[#9E9585] ml-0.5">({props.count})</span>
       )}
     </span>
   );

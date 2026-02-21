@@ -5,6 +5,9 @@ import { StoreCard } from "@/types";
 import { storesApi } from "@/lib/stores-api";
 import DirectoryCard from "@/components/shared/DirectoryCard";
 
+const inputCls =
+  "border border-[#EDE9E3] rounded-xl px-4 py-3 text-sm bg-white text-[#0E1520] placeholder-[#C8C0B0] focus:outline-none focus:ring-2 focus:ring-[#B09145] focus:border-transparent transition-shadow";
+
 export default function StoresPage() {
   const [stores, setStores] = useState<StoreCard[]>([]);
   const [total, setTotal] = useState(0);
@@ -31,25 +34,28 @@ export default function StoresPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Watch Stores</h1>
-        <p className="text-gray-500 mb-6">{total.toLocaleString()} stores worldwide</p>
+    <div className="max-w-7xl mx-auto px-4 py-10">
+      <div className="mb-10">
+        <p className="tt-section-label text-[#B09145] mb-2">Directory</p>
+        <h1 className="font-display italic text-4xl text-[#0E1520] mb-1">Watch Stores</h1>
+        <p className="text-[#9E9585] text-sm mb-6">
+          {total > 0 ? `${total.toLocaleString()} authorized dealers & boutiques worldwide` : "Authorized dealers & boutiques worldwide"}
+        </p>
 
         <form onSubmit={handleSearch} className="flex gap-2 max-w-2xl flex-wrap">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search stores..."
-            className="flex-1 min-w-40 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white"
+            className={`flex-1 min-w-40 ${inputCls}`}
           />
           <input
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder="City"
-            className="w-36 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white"
+            className={`w-36 ${inputCls}`}
           />
-          <button type="submit" className="bg-gray-900 text-white px-6 py-3 rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors">
+          <button type="submit" className="tt-btn-gold text-xs py-3 px-6 rounded-xl">
             Search
           </button>
         </form>
@@ -58,21 +64,21 @@ export default function StoresPage() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 9 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-gray-100 p-5 animate-pulse">
+            <div key={i} className="bg-white rounded-2xl border border-[#EDE9E3] p-5 animate-pulse">
               <div className="flex gap-4 mb-4">
-                <div className="w-14 h-14 bg-gray-100 rounded-xl" />
+                <div className="w-14 h-14 bg-[#F0EDE8] rounded-xl" />
                 <div className="flex-1 space-y-2 pt-1">
-                  <div className="h-4 bg-gray-100 rounded w-2/3" />
-                  <div className="h-3 bg-gray-100 rounded w-1/2" />
+                  <div className="h-4 bg-[#EDE9E3] rounded w-2/3" />
+                  <div className="h-3 bg-[#EDE9E3] rounded w-1/2" />
                 </div>
               </div>
-              <div className="h-3 bg-gray-100 rounded w-1/3" />
+              <div className="h-3 bg-[#EDE9E3] rounded w-1/3" />
             </div>
           ))}
         </div>
       ) : stores.length === 0 ? (
         <div className="text-center py-24">
-          <p className="text-gray-400 text-lg">No stores found</p>
+          <p className="font-display italic text-2xl text-[#9E9585]">No stores found</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

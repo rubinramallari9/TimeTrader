@@ -1,26 +1,171 @@
 @import "tailwindcss";
+@import "@fontsource/cormorant-garamond/400.css";
+@import "@fontsource/cormorant-garamond/400-italic.css";
+@import "@fontsource/cormorant-garamond/600.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
 
+/* ── TimeTrader Design Tokens ─────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Backgrounds */
+  --tt-navy:       #0E1520;   /* primary dark bg */
+  --tt-forest:     #132A24;   /* dark green sections */
+  --tt-card:       #F8F6F2;   /* warm white card bg */
+  --tt-card-dark:  #161E2E;   /* dark card bg */
+
+  /* Text */
+  --tt-white:      #FFFFFF;
+  --tt-off-white:  #EDE9E3;
+  --tt-muted:      #9E9585;
+  --tt-dark:       #0E1520;
+
+  /* Accents */
+  --tt-gold:       #B09145;   /* primary accent — Patek gold */
+  --tt-gold-light: #C8A96E;   /* hover gold */
+  --tt-green:      #006039;   /* Rolex green — trust signals */
+  --tt-teal:       #0D9488;   /* certified / verified */
+
+  /* Condition colors */
+  --tt-cond-new:       #0D9488;
+  --tt-cond-excellent: #4A6FA5;
+  --tt-cond-good:      #B07D2A;
+  --tt-cond-fair:      #C06B2A;
+  --tt-cond-poor:      #7B7B7B;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--tt-card);
+  --color-foreground: var(--tt-dark);
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* ── Base ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--tt-card);
+  color: var(--tt-dark);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Typography helpers ───────────────────────────────── */
+.font-display { font-family: 'Cormorant Garamond', Georgia, serif; }
+
+.tt-hero-headline {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.tt-section-label {
+  font-size: 0.6875rem;       /* 11px */
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.tt-brand-name {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tt-muted);
+}
+
+/* ── Luxury card ──────────────────────────────────────── */
+.tt-card {
+  background: #FFFFFF;
+  border: 1px solid #EDE9E3;
+  border-radius: 1rem;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+.tt-card:hover {
+  box-shadow: 0 8px 32px rgba(14,21,32,0.10);
+  border-color: var(--tt-gold);
+  transform: translateY(-2px);
+}
+
+/* ── Gold CTA button ──────────────────────────────────── */
+.tt-btn-gold {
+  background: var(--tt-gold);
+  color: #FFFFFF;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.tt-btn-gold:hover { background: var(--tt-gold-light); }
+
+.tt-btn-outline {
+  background: transparent;
+  color: var(--tt-gold);
+  border: 1px solid var(--tt-gold);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.tt-btn-outline:hover {
+  background: var(--tt-gold);
+  color: #FFFFFF;
+}
+
+/* ── Ghost button (for dark sections) ────────────────── */
+.tt-btn-ghost {
+  background: transparent;
+  color: #FFFFFF;
+  border: 1px solid rgba(255,255,255,0.4);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 0.5rem;
+  padding: 0.75rem 2rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.tt-btn-ghost:hover {
+  border-color: #FFFFFF;
+  background: rgba(255,255,255,0.08);
+}
+
+/* ── Condition badge pills ────────────────────────────── */
+.badge-new       { background: #DCFAF6; color: #0D9488; }
+.badge-excellent { background: #DBEAFE; color: #1D4ED8; }
+.badge-good      { background: #FEF3C7; color: #92400E; }
+.badge-fair      { background: #FFEDD5; color: #9A3412; }
+.badge-poor      { background: #F3F4F6; color: #6B7280; }
+
+/* ── Gold divider ─────────────────────────────────────── */
+.tt-divider {
+  width: 3rem;
+  height: 1px;
+  background: var(--tt-gold);
+  margin: 1rem 0;
+}
+
+/* ── Scrollbar styling ────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #C8C0B0; border-radius: 3px; }
+
+/* ── Image overlay gradient ───────────────────────────── */
+.tt-img-overlay {
+  background: linear-gradient(to top, rgba(14,21,32,0.7) 0%, transparent 60%);
 }

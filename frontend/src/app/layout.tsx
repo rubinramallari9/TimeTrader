@@ -1,19 +1,17 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "@/components/auth/AuthProvider";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
-
 export const metadata: Metadata = {
-  title: "Adriel — The Watch Marketplace",
-  description: "Buy, sell, authenticate, and discover watches. Find watch stores and repair shops near you.",
+  title: { default: "TimeTrader — The Luxury Watch Marketplace", template: "%s | TimeTrader" },
+  description: "Buy, sell, and authenticate luxury watches. Discover certified pre-owned Rolex, Patek Philippe, Audemars Piguet, and more from verified sellers worldwide.",
+  keywords: ["luxury watches", "pre-owned watches", "Rolex", "Patek Philippe", "Audemars Piguet", "watch authentication", "watch marketplace"],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${geist.variable} font-sans antialiased bg-white text-gray-900`}>
+      <body className="antialiased">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

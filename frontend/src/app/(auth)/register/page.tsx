@@ -8,13 +8,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuthStore } from "@/store/auth";
 import { AxiosError } from "axios";
+
 type PublicRole = "buyer" | "seller" | "store" | "repair";
 
-const ROLES: { value: PublicRole; label: string; description: string }[] = [
-  { value: "buyer", label: "Buyer", description: "Browse and purchase watches" },
-  { value: "seller", label: "Seller", description: "List watches for sale" },
-  { value: "store", label: "Watch Store", description: "Advertise your store" },
-  { value: "repair", label: "Repair Shop", description: "Offer repair services" },
+const ROLES: { value: PublicRole; label: string; description: string; icon: string }[] = [
+  { value: "buyer", label: "Buyer", description: "Browse & purchase", icon: "🛒" },
+  { value: "seller", label: "Seller", description: "List watches for sale", icon: "🏷️" },
+  { value: "store", label: "Watch Store", description: "Advertise your store", icon: "🏪" },
+  { value: "repair", label: "Repair Shop", description: "Offer repair services", icon: "🔧" },
 ];
 
 const schema = z
@@ -33,6 +34,11 @@ const schema = z
   });
 
 type FormData = z.infer<typeof schema>;
+
+const inputCls =
+  "w-full bg-[#0E1520] border border-[#1E2D40] rounded-lg px-4 py-3 text-sm text-white placeholder-[#4A5568] focus:outline-none focus:ring-2 focus:ring-[#B09145] focus:border-transparent transition-shadow";
+
+const labelCls = "block text-[10px] font-semibold tracking-[0.12em] uppercase text-[#9E9585] mb-1.5";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -68,15 +74,19 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
-        <div className="text-4xl mb-4">✓</div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Check your email</h2>
-        <p className="text-sm text-gray-500">
-          We sent a verification link to your email. Click it to activate your account.
+      <div className="bg-[#161E2E] border border-[#1E2D40] rounded-2xl p-8 shadow-2xl shadow-black/40 text-center">
+        <div className="w-14 h-14 rounded-full bg-[#B09145]/10 border border-[#B09145]/30 flex items-center justify-center mx-auto mb-4">
+          <svg className="w-6 h-6 text-[#B09145]" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+          </svg>
+        </div>
+        <h2 className="text-xl font-semibold text-white mb-2">Verify your email</h2>
+        <p className="text-sm text-[#9E9585] mb-6">
+          We sent a verification link to your email address. Click it to activate your account.
         </p>
         <Link
           href="/login"
-          className="mt-6 inline-block text-sm font-medium text-gray-900 hover:underline"
+          className="tt-btn-gold inline-block py-2.5 px-6 rounded-lg text-sm"
         >
           Back to sign in
         </Link>
@@ -85,116 +95,112 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">Create account</h2>
+    <div className="bg-[#161E2E] border border-[#1E2D40] rounded-2xl p-8 shadow-2xl shadow-black/40">
+      <h2 className="text-xl font-semibold text-white mb-1">Join TimeTrader</h2>
+      <p className="text-sm text-[#9E9585] mb-6">Create your account to get started</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {serverError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+          <div className="bg-red-900/20 border border-red-800/50 text-red-400 text-sm rounded-lg px-4 py-3">
             {serverError}
           </div>
         )}
 
         {/* Role selector */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">I am a...</label>
+          <label className={labelCls}>I am a...</label>
           <div className="grid grid-cols-2 gap-2">
             {ROLES.map((r) => (
               <button
                 key={r.value}
                 type="button"
                 onClick={() => setValue("role", r.value)}
-                className={`text-left p-3 rounded-lg border text-sm transition-colors ${
+                className={`text-left p-3 rounded-xl border transition-all duration-200 ${
                   selectedRole === r.value
-                    ? "border-gray-900 bg-gray-50"
-                    : "border-gray-200 hover:border-gray-400"
+                    ? "border-[#B09145] bg-[#B09145]/10"
+                    : "border-[#1E2D40] hover:border-[#2A3A50]"
                 }`}
               >
-                <span className="font-medium block">{r.label}</span>
-                <span className="text-xs text-gray-500">{r.description}</span>
+                <span className="text-base mb-1 block">{r.icon}</span>
+                <span className="font-semibold text-xs text-white block">{r.label}</span>
+                <span className="text-[10px] text-[#9E9585]">{r.description}</span>
               </button>
             ))}
           </div>
-          {errors.role && <p className="text-xs text-red-600 mt-1">{errors.role.message}</p>}
+          {errors.role && <p className="text-xs text-red-400 mt-1">{errors.role.message}</p>}
         </div>
 
         {/* Name row */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">First name</label>
-            <input
-              {...register("first_name")}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-            />
-            {errors.first_name && <p className="text-xs text-red-600 mt-1">{errors.first_name.message}</p>}
+            <label className={labelCls}>First name</label>
+            <input {...register("first_name")} className={inputCls} />
+            {errors.first_name && <p className="text-xs text-red-400 mt-1">{errors.first_name.message}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Last name</label>
-            <input
-              {...register("last_name")}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-            />
-            {errors.last_name && <p className="text-xs text-red-600 mt-1">{errors.last_name.message}</p>}
+            <label className={labelCls}>Last name</label>
+            <input {...register("last_name")} className={inputCls} />
+            {errors.last_name && <p className="text-xs text-red-400 mt-1">{errors.last_name.message}</p>}
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+          <label className={labelCls}>Username</label>
           <input
             {...register("username")}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+            className={inputCls}
             placeholder="watchcollector42"
           />
-          {errors.username && <p className="text-xs text-red-600 mt-1">{errors.username.message}</p>}
+          {errors.username && <p className="text-xs text-red-400 mt-1">{errors.username.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <label className={labelCls}>Email</label>
           <input
             {...register("email")}
             type="email"
             autoComplete="email"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+            className={inputCls}
           />
-          {errors.email && <p className="text-xs text-red-600 mt-1">{errors.email.message}</p>}
+          {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <label className={labelCls}>Password</label>
           <input
             {...register("password")}
             type="password"
             autoComplete="new-password"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+            className={inputCls}
           />
-          {errors.password && <p className="text-xs text-red-600 mt-1">{errors.password.message}</p>}
+          {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Confirm password</label>
+          <label className={labelCls}>Confirm password</label>
           <input
             {...register("password_confirm")}
             type="password"
             autoComplete="new-password"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+            className={inputCls}
           />
           {errors.password_confirm && (
-            <p className="text-xs text-red-600 mt-1">{errors.password_confirm.message}</p>
+            <p className="text-xs text-red-400 mt-1">{errors.password_confirm.message}</p>
           )}
         </div>
 
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-gray-900 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 disabled:opacity-50 transition-colors mt-2"
+          className="tt-btn-gold w-full py-3 rounded-lg text-sm disabled:opacity-50 mt-2"
         >
           {isLoading ? "Creating account..." : "Create account"}
         </button>
       </form>
 
-      <p className="text-center text-sm text-gray-500 mt-6">
+      <p className="text-center text-sm text-[#9E9585] mt-6">
         Already have an account?{" "}
-        <Link href="/login" className="font-medium text-gray-900 hover:underline">
+        <Link href="/login" className="font-semibold text-[#B09145] hover:text-[#C8A96E] transition-colors">
           Sign in
         </Link>
       </p>

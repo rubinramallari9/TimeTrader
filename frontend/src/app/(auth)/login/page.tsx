@@ -16,10 +16,15 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+const inputCls =
+  "w-full bg-[#0E1520] border border-[#1E2D40] rounded-lg px-4 py-3 text-sm text-white placeholder-[#4A5568] focus:outline-none focus:ring-2 focus:ring-[#B09145] focus:border-transparent transition-shadow";
+
+const labelCls = "block text-[10px] font-semibold tracking-[0.12em] uppercase text-[#9E9585] mb-1.5";
+
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const from = searchParams.get("from") ?? "/dashboard";
+  const from = searchParams.get("from") ?? "/listings";
   const { login, isLoading } = useAuthStore();
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -45,42 +50,43 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">Sign in</h2>
+    <div className="bg-[#161E2E] border border-[#1E2D40] rounded-2xl p-8 shadow-2xl shadow-black/40">
+      <h2 className="text-xl font-semibold text-white mb-1">Welcome back</h2>
+      <p className="text-sm text-[#9E9585] mb-6">Sign in to your TimeTrader account</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {serverError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+          <div className="bg-red-900/20 border border-red-800/50 text-red-400 text-sm rounded-lg px-4 py-3">
             {serverError}
           </div>
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <label className={labelCls}>Email</label>
           <input
             {...register("email")}
             type="email"
             autoComplete="email"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+            className={inputCls}
             placeholder="you@example.com"
           />
-          {errors.email && <p className="text-xs text-red-600 mt-1">{errors.email.message}</p>}
+          {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <label className={labelCls}>Password</label>
           <input
             {...register("password")}
             type="password"
             autoComplete="current-password"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+            className={inputCls}
             placeholder="••••••••"
           />
-          {errors.password && <p className="text-xs text-red-600 mt-1">{errors.password.message}</p>}
+          {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password.message}</p>}
         </div>
 
         <div className="flex justify-end">
-          <Link href="/reset-password" className="text-xs text-gray-500 hover:text-gray-900">
+          <Link href="/reset-password" className="text-[10px] font-semibold tracking-widest uppercase text-[#9E9585] hover:text-[#B09145] transition-colors">
             Forgot password?
           </Link>
         </div>
@@ -88,16 +94,25 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-gray-900 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 disabled:opacity-50 transition-colors"
+          className="tt-btn-gold w-full py-3 rounded-lg text-sm disabled:opacity-50"
         >
           {isLoading ? "Signing in..." : "Sign in"}
         </button>
       </form>
 
-      <p className="text-center text-sm text-gray-500 mt-6">
-        Don&apos;t have an account?{" "}
-        <Link href="/register" className="font-medium text-gray-900 hover:underline">
-          Create one
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-[#1E2D40]" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="px-3 text-[10px] text-[#4A5568] bg-[#161E2E] tracking-widest uppercase">or</span>
+        </div>
+      </div>
+
+      <p className="text-center text-sm text-[#9E9585]">
+        New to TimeTrader?{" "}
+        <Link href="/register" className="font-semibold text-[#B09145] hover:text-[#C8A96E] transition-colors">
+          Create account
         </Link>
       </p>
     </div>

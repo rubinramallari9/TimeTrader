@@ -22,29 +22,29 @@ export default function DirectoryCard({
 }: Props) {
   return (
     <Link href={href} className="group block">
-      <div className={`bg-white rounded-2xl border overflow-hidden hover:shadow-md transition-all duration-200 ${is_featured ? "border-amber-200" : "border-gray-100 hover:border-gray-200"}`}>
+      <div className="tt-card overflow-hidden">
         {is_featured && (
-          <div className="bg-amber-50 text-amber-700 text-xs font-medium px-3 py-1 text-center">
+          <div className="bg-[#B09145] text-white text-[10px] font-semibold tracking-[0.12em] uppercase px-3 py-1.5 text-center">
             Featured
           </div>
         )}
         <div className="p-5">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden">
+            <div className="w-14 h-14 rounded-xl bg-[#F0EDE8] flex-shrink-0 overflow-hidden border border-[#EDE9E3]">
               {logo_url ? (
                 <Image src={logo_url} alt={name} width={56} height={56} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-xl font-bold text-gray-300">
+                <div className="w-full h-full flex items-center justify-center text-xl font-bold text-[#C8C0B0]">
                   {name[0]}
                 </div>
               )}
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <h3 className="font-semibold text-gray-900 truncate">{name}</h3>
+              <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+                <h3 className="font-semibold text-[#0E1520] truncate">{name}</h3>
                 {is_verified && <VerifiedBadge />}
               </div>
-              <p className="text-xs text-gray-400 truncate">
+              <p className="text-xs text-[#9E9585] truncate">
                 {[city, country].filter(Boolean).join(", ")}
               </p>
             </div>
@@ -52,7 +52,7 @@ export default function DirectoryCard({
 
           <div className="flex items-center justify-between">
             <StarRating rating={average_rating} count={review_count} />
-            {meta && <span className="text-xs text-gray-400">{meta}</span>}
+            {meta && <span className="text-xs text-[#9E9585]">{meta}</span>}
           </div>
         </div>
       </div>
