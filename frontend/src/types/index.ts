@@ -110,6 +110,95 @@ export interface CreateListingData {
   location_country?: string;
 }
 
+// ── Stores ────────────────────────────────────────────────
+
+export interface StoreCard {
+  id: string;
+  name: string;
+  slug: string;
+  logo_url: string | null;
+  city: string;
+  country: string;
+  is_featured: boolean;
+  is_verified: boolean;
+  average_rating: number;
+  review_count: number;
+}
+
+export interface StoreDetail extends StoreCard {
+  description: string;
+  website: string;
+  phone: string;
+  email: string;
+  address: string;
+  latitude: string | null;
+  longitude: string | null;
+  opening_hours: Record<string, string>;
+  owner: PublicUser;
+  images: { id: string; url: string; order: number }[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Review {
+  id: string;
+  author: PublicUser;
+  rating: number;
+  content: string;
+  created_at: string;
+}
+
+// ── Repair Shops ──────────────────────────────────────────
+
+export interface RepairService {
+  id: string;
+  name: string;
+  description: string;
+  price_from: string | null;
+  price_to: string | null;
+  duration_days: number | null;
+  created_at: string;
+}
+
+export interface RepairShopCard {
+  id: string;
+  name: string;
+  slug: string;
+  logo_url: string | null;
+  city: string;
+  country: string;
+  is_featured: boolean;
+  is_verified: boolean;
+  average_rating: number;
+  review_count: number;
+  service_count: number;
+}
+
+export interface RepairShopDetail extends RepairShopCard {
+  description: string;
+  phone: string;
+  email: string;
+  address: string;
+  latitude: string | null;
+  longitude: string | null;
+  opening_hours: Record<string, string>;
+  owner: PublicUser;
+  services: RepairService[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Appointment {
+  id: string;
+  shop: string;
+  service: RepairService | null;
+  customer: PublicUser;
+  scheduled_at: string;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
+  notes: string;
+  created_at: string;
+}
+
 export interface ListingFilters {
   search?: string;
   brand?: string;
