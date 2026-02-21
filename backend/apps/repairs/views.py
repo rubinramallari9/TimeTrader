@@ -23,6 +23,7 @@ class RepairPagination(PageNumberPagination):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([AllowAny])
 def repair_shops(request):
     if request.method == "GET":
         qs = RepairShop.objects.all()
@@ -55,6 +56,7 @@ def repair_shops(request):
 
 
 @api_view(["GET", "PATCH", "DELETE"])
+@permission_classes([AllowAny])
 def repair_shop_detail(request, slug):
     try:
         shop = RepairShop.objects.prefetch_related("services", "reviews__author").get(slug=slug)
@@ -81,6 +83,7 @@ def repair_shop_detail(request, slug):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([AllowAny])
 def repair_services(request, slug):
     try:
         shop = RepairShop.objects.get(slug=slug)
@@ -163,6 +166,7 @@ def appointment_detail(request, slug, appt_id):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([AllowAny])
 def repair_reviews(request, slug):
     try:
         shop = RepairShop.objects.get(slug=slug)

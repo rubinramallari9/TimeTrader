@@ -26,6 +26,7 @@ class ListingPagination(PageNumberPagination):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([AllowAny])
 def listings(request):
     if request.method == "GET":
         return _list_listings(request)
@@ -79,6 +80,7 @@ def _create_listing(request):
 
 
 @api_view(["GET", "PATCH", "DELETE"])
+@permission_classes([AllowAny])
 def listing_detail(request, listing_id):
     try:
         listing = Listing.objects.select_related("seller").prefetch_related("images", "saved_by").get(id=listing_id)

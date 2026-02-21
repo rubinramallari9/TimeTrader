@@ -21,6 +21,7 @@ class StorePagination(PageNumberPagination):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([AllowAny])
 def stores(request):
     if request.method == "GET":
         qs = Store.objects.all()
@@ -55,6 +56,7 @@ def stores(request):
 
 
 @api_view(["GET", "PATCH", "DELETE"])
+@permission_classes([AllowAny])
 def store_detail(request, slug):
     try:
         store = Store.objects.prefetch_related("images", "reviews__author").get(slug=slug)
@@ -97,6 +99,7 @@ def upload_store_logo(request, slug):
 
 
 @api_view(["GET", "POST"])
+@permission_classes([AllowAny])
 def store_reviews(request, slug):
     try:
         store = Store.objects.get(slug=slug)
