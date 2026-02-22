@@ -8,17 +8,18 @@ import { useAuthStore } from "@/store/auth";
 import ListingCard from "@/components/listings/ListingCard";
 
 export default function SavedListingsPage() {
-  const { user } = useAuthStore();
+  const { user, isInitialized } = useAuthStore();
   const router = useRouter();
   const [listings, setListings] = useState<ListingCardType[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!isInitialized) return;
     if (!user) { router.push("/login?from=/listings/saved"); return; }
     listingsApi.getSaved()
       .then(({ data }) => setListings(data.results))
       .finally(() => setLoading(false));
-  }, [user, router]);
+  }, [user, router, isInitialized]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">

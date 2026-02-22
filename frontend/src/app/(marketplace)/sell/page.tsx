@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,7 +38,7 @@ const sectionCls = "bg-white border border-[#EDE9E3] rounded-2xl p-6 space-y-4";
 
 export default function SellPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isInitialized } = useAuthStore();
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -50,7 +50,14 @@ export default function SellPage() {
     defaultValues: { currency: "USD", condition: "excellent" },
   });
 
-  if (!user || (user.role !== "seller" && user.role !== "store" && user.role !== "admin")) {
+  useEffect(() => {
+    if (!isInitialized) return;
+    if (!user) router.push("/login?from=/sell");
+  }, [isInitialized, user, router]);
+
+  if (!isInitialized || !user) return null;
+
+  if (user.role !== "seller" && user.role !== "store" && user.role !== "admin") {
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
         <p className="font-display italic text-2xl text-[#9E9585] mb-2">Access restricted</p>

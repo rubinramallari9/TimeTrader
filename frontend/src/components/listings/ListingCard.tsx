@@ -52,7 +52,7 @@ export default function ListingCard({ listing }: Props) {
               src={listing.primary_image.url}
               alt={listing.title}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className="object-cover"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             />
           ) : (

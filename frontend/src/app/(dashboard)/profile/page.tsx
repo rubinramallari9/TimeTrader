@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,7 +27,7 @@ const ROLE_LABELS: Record<string, string> = {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, updateMe, logout, isLoading } = useAuthStore();
+  const { user, updateMe, logout, isLoading, isInitialized } = useAuthStore();
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -45,10 +45,12 @@ export default function ProfilePage() {
     },
   });
 
-  if (!user) {
-    router.push("/login");
-    return null;
-  }
+  useEffect(() => {
+    if (!isInitialized) return;
+    if (!user) router.push("/login");
+  }, [isInitialized, user, router]);
+
+  if (!isInitialized || !user) return null;
 
   const onSubmit = async (data: FormData) => {
     setServerError(null);

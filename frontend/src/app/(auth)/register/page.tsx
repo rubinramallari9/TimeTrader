@@ -44,7 +44,6 @@ export default function RegisterPage() {
   const router = useRouter();
   const { register: registerUser, isLoading } = useAuthStore();
   const [serverError, setServerError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
 
   const {
     register,
@@ -63,36 +62,18 @@ export default function RegisterPage() {
     setServerError(null);
     try {
       await registerUser(data);
-      setSuccess(true);
+      router.push("/listings");
     } catch (err) {
-      const axiosErr = err as AxiosError<{ message?: string; fields?: Record<string, string[]> }>;
-      const fields = axiosErr.response?.data?.fields;
-      const firstField = fields ? Object.values(fields)[0]?.[0] : null;
-      setServerError(firstField ?? axiosErr.response?.data?.message ?? "Registration failed.");
+      const axiosErr = err as AxiosError<Record<string, string | string[]>>;
+      const data = axiosErr.response?.data;
+      if (data) {
+        const firstError = Object.values(data).flat().find((v) => typeof v === "string");
+        setServerError(firstError ?? "Registration failed.");
+      } else {
+        setServerError("Registration failed. Please try again.");
+      }
     }
   };
-
-  if (success) {
-    return (
-      <div className="bg-[#161E2E] border border-[#1E2D40] rounded-2xl p-8 shadow-2xl shadow-black/40 text-center">
-        <div className="w-14 h-14 rounded-full bg-[#B09145]/10 border border-[#B09145]/30 flex items-center justify-center mx-auto mb-4">
-          <svg className="w-6 h-6 text-[#B09145]" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-          </svg>
-        </div>
-        <h2 className="text-xl font-semibold text-white mb-2">Verify your email</h2>
-        <p className="text-sm text-[#9E9585] mb-6">
-          We sent a verification link to your email address. Click it to activate your account.
-        </p>
-        <Link
-          href="/login"
-          className="tt-btn-gold inline-block py-2.5 px-6 rounded-lg text-sm"
-        >
-          Back to sign in
-        </Link>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-[#161E2E] border border-[#1E2D40] rounded-2xl p-8 shadow-2xl shadow-black/40">

@@ -75,7 +75,7 @@ export default function ListingsPage() {
           </p>
 
           {/* Search bar */}
-          <form onSubmit={handleSearch} className="flex gap-2 max-w-2xl mb-8">
+          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2 max-w-2xl mb-8">
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}

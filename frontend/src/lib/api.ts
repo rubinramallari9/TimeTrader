@@ -48,14 +48,13 @@ api.interceptors.response.use(
         const { data } = await axios.post<AuthTokens>(`${BASE_URL}/auth/token/refresh/`, {
           refresh: tokens.refresh,
         });
-        storeTokens({ access: data.access, refresh: tokens.refresh });
+        storeTokens({ access: data.access, refresh: data.refresh ?? tokens.refresh });
         refreshSubscribers.forEach((cb) => cb(data.access));
         refreshSubscribers = [];
         originalRequest.headers.Authorization = `Bearer ${data.access}`;
         return api(originalRequest);
       } catch {
         clearStoredTokens();
-        if (typeof window !== "undefined") window.location.href = "/login";
         return Promise.reject(error);
       } finally {
         isRefreshing = false;

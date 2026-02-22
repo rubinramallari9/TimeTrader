@@ -10,7 +10,7 @@ export const authApi = {
     first_name?: string;
     last_name?: string;
     role?: Exclude<UserRole, "admin">;
-  }) => api.post<{ message: string; user: User }>("/auth/register/", data),
+  }) => api.post<AuthResponse>("/auth/register/", data),
 
   login: (data: { email: string; password: string }) =>
     api.post<AuthResponse>("/auth/login/", data),

@@ -80,7 +80,7 @@ export default function HomePage() {
             <div>
               <p className="tt-section-label text-[#B09145] mb-5">The World&apos;s Finest</p>
 
-              <h1 className="tt-hero-headline text-white text-5xl sm:text-6xl md:text-7xl mb-6 leading-[1.02]">
+              <h1 className="tt-hero-headline text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-6 leading-[1.02]">
                 Where Exceptional<br />
                 <span className="text-[#B09145]">Timepieces</span> Find<br />
                 New Wrists
@@ -90,7 +90,7 @@ export default function HomePage() {
                 Buy and sell certified pre-owned luxury watches from verified sellers worldwide. Every piece backed by AI authentication.
               </p>
 
-              <form onSubmit={handleSearch} className="flex gap-2 max-w-xl mb-10">
+              <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2 max-w-xl mb-10">
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
@@ -103,10 +103,10 @@ export default function HomePage() {
               </form>
 
               <div className="flex flex-wrap gap-3">
-                <Link href="/listings" className="tt-btn-gold py-3 px-7 rounded-xl text-sm">
+                <Link href="/listings" className="tt-btn-gold py-3 rounded-xl text-sm text-center w-44">
                   Browse Watches
                 </Link>
-                <Link href="/sell" className="tt-btn-ghost py-3 px-7 rounded-xl text-sm">
+                <Link href="/sell" className="tt-btn-ghost py-3 rounded-xl text-sm text-center w-44">
                   List Your Watch
                 </Link>
               </div>

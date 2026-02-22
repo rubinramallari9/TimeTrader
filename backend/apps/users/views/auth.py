@@ -35,13 +35,9 @@ def register(request):
     serializer = RegisterSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = serializer.save()
-    # Create email verification token
-    EmailVerificationToken.objects.create(user=user)
-    # TODO: send verification email via Celery task (Stage 8)
-    return Response(
-        {"message": "Account created. Please verify your email.", "user": UserProfileSerializer(user).data},
-        status=status.HTTP_201_CREATED,
-    )
+    user.is_verified = True
+    user.save(update_fields=["is_verified"])
+    return Response(_token_response(user), status=status.HTTP_201_CREATED)
 
 
 @api_view(["POST"])

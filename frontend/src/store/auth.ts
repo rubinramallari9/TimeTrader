@@ -10,7 +10,7 @@ interface AuthState {
   isLoading: boolean;
   isInitialized: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (data: RegisterData) => Promise<{ message: string }>;
+  register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
   googleLogin: (idToken: string, role?: UserRole) => Promise<void>;
   fetchMe: () => Promise<void>;
@@ -44,7 +44,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       await get().fetchMe();
     } catch {
-      clearStoredTokens();
+      // Tokens already cleared by the response interceptor if refresh failed.
+      // Don't clear here to avoid wiping tokens on transient network errors.
     } finally {
       set({ isInitialized: true });
     }
@@ -65,7 +66,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: true });
     try {
       const { data: res } = await authApi.register(data);
-      return res;
+      storeTokens({ access: res.access, refresh: res.refresh });
+      set({ user: res.user });
     } finally {
       set({ isLoading: false });
     }
