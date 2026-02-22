@@ -117,7 +117,7 @@ export default function SellPage() {
             <h2 className="font-semibold text-[#0E1520] mb-0.5">Photos</h2>
             <p className="text-xs text-[#9E9585]">Up to 10 photos. First photo will be the cover image.</p>
           </div>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {previews.map((src, i) => (
               <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-[#F0EDE8] border border-[#EDE9E3]">
                 <Image src={src} alt="" fill className="object-cover" sizes="100px" />
@@ -160,7 +160,7 @@ export default function SellPage() {
             {errors.title && <p className="text-xs text-red-600 mt-1">{errors.title.message}</p>}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Brand</label>
               <input {...register("brand")} className={inputCls} placeholder="Rolex" />
@@ -173,7 +173,7 @@ export default function SellPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Reference No.</label>
               <input {...register("reference_number")} className={inputCls} placeholder="116610LN" />
@@ -195,7 +195,7 @@ export default function SellPage() {
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Movement</label>
               <select {...register("movement_type")} className={inputCls}>
@@ -255,7 +255,7 @@ export default function SellPage() {
         {/* Location */}
         <div className={sectionCls}>
           <h2 className="font-semibold text-[#0E1520]">Location</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>City</label>
               <input {...register("location_city")} className={inputCls} placeholder="Dubai" />

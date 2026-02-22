@@ -97,7 +97,7 @@ export default function ListingDetailPage() {
         <span className="text-[#0E1520]">{listing.brand} {listing.model}</span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
         {/* Images */}
         <div>
           <div className="relative aspect-square rounded-2xl overflow-hidden bg-[#F0EDE8] mb-3 border border-[#EDE9E3]">
@@ -146,7 +146,7 @@ export default function ListingDetailPage() {
           <h1 className="text-2xl font-bold text-[#0E1520] mb-1">{listing.title}</h1>
           <p className="text-[#9E9585] text-sm mb-5">{listing.model}</p>
 
-          <p className="text-4xl font-bold text-[#0E1520] mb-7 font-display">{price}</p>
+          <p className="text-3xl sm:text-4xl font-bold text-[#0E1520] mb-7 font-display">{price}</p>
 
           {/* Actions */}
           <div className="flex gap-3 mb-8">
@@ -211,7 +211,7 @@ export default function ListingDetailPage() {
               <p className="text-[10px] font-semibold tracking-widest uppercase text-[#9E9585] capitalize">{listing.seller.role}</p>
             </div>
             {(listing.location_city || listing.location_country) && (
-              <p className="text-xs text-[#9E9585] ml-auto flex-shrink-0">
+              <p className="text-xs text-[#9E9585] ml-auto flex-shrink-0 hidden sm:block">
                 {[listing.location_city, listing.location_country].filter(Boolean).join(", ")}
               </p>
             )}

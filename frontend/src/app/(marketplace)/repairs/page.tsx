@@ -42,18 +42,18 @@ export default function RepairsPage() {
           {total > 0 ? `${total.toLocaleString()} certified repair shops worldwide` : "Certified repair shops worldwide"}
         </p>
 
-        <form onSubmit={handleSearch} className="flex gap-2 max-w-2xl flex-wrap">
+        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2 max-w-2xl">
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search repair shops..."
-            className={`flex-1 min-w-40 ${inputCls}`}
+            className={`flex-1 ${inputCls}`}
           />
           <input
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder="City"
-            className={`w-36 ${inputCls}`}
+            className={`sm:w-36 ${inputCls}`}
           />
           <button type="submit" className="tt-btn-gold text-xs py-3 px-6 rounded-xl">
             Search

@@ -87,7 +87,7 @@ export default function RepairShopDetailPage() {
       </nav>
 
       {/* Header */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6 mb-6">
         <div className="flex items-start gap-5">
           <div className="w-20 h-20 rounded-2xl bg-gray-100 flex-shrink-0 overflow-hidden">
             {shop.logo_url ? (
@@ -117,7 +117,7 @@ export default function RepairShopDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Services */}
         {shop.services.length > 0 && (
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
             <h2 className="font-semibold text-gray-900 mb-4">Services</h2>
             <div className="space-y-3">
               {shop.services.map((s) => (
@@ -142,7 +142,7 @@ export default function RepairShopDetailPage() {
 
         {/* Book appointment */}
         {user && !isOwner && (
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
             <h2 className="font-semibold text-gray-900 mb-4">Book Appointment</h2>
             {apptSuccess ? (
               <div className="bg-green-50 border border-green-200 text-green-700 rounded-xl p-4 text-sm">
@@ -185,7 +185,7 @@ export default function RepairShopDetailPage() {
       </div>
 
       {/* Reviews */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
         <h2 className="font-semibold text-gray-900 mb-4">Reviews ({shop.review_count})</h2>
         {user && !isOwner && (
           <form onSubmit={submitReview} className="border border-gray-100 rounded-xl p-4 mb-6 space-y-3">

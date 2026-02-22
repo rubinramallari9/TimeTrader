@@ -69,7 +69,7 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-start sm:items-center justify-between gap-3 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
           <p className="text-sm text-gray-500 mt-1">{user.email}</p>
@@ -99,7 +99,7 @@ export default function ProfilePage() {
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">First name</label>
               <input

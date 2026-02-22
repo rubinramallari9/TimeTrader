@@ -24,7 +24,7 @@ export default function SavedListingsPage() {
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Saved Watches</h1>
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse">
               <div className="aspect-square bg-gray-100" />
@@ -42,7 +42,7 @@ export default function SavedListingsPage() {
           <p className="text-gray-400 text-sm mt-1">Browse listings and tap the heart icon to save.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {listings.map((l) => <ListingCard key={l.id} listing={l} />)}
         </div>
       )}

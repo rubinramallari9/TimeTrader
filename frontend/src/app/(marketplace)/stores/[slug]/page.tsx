@@ -69,7 +69,7 @@ export default function StoreDetailPage() {
       </nav>
 
       {/* Header */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6 mb-6">
         <div className="flex items-start gap-5">
           <div className="w-20 h-20 rounded-2xl bg-gray-100 flex-shrink-0 overflow-hidden">
             {store.logo_url ? (
@@ -106,9 +106,9 @@ export default function StoreDetailPage() {
 
       {/* Opening hours */}
       {Object.keys(store.opening_hours).length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-6">
+        <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6 mb-6">
           <h2 className="font-semibold text-gray-900 mb-4">Opening Hours</h2>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {DAYS.filter((d) => store.opening_hours[d]).map((d) => (
               <div key={d} className="flex justify-between text-sm">
                 <span className="text-gray-500">{DAY_LABELS[d]}</span>
@@ -120,7 +120,7 @@ export default function StoreDetailPage() {
       )}
 
       {/* Reviews */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-6">
         <h2 className="font-semibold text-gray-900 mb-4">Reviews ({store.review_count})</h2>
 
         {user && !isOwner && (
