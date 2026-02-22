@@ -71,7 +71,6 @@ export default function HomePage() {
 
       {/* ── Hero ────────────────────────────────────────── */}
       <section className="relative bg-[#0E1520] overflow-hidden pt-16">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,_#132A24_0%,_transparent_70%)] pointer-events-none" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#B09145]/30 to-transparent" />
 
         <div className="relative max-w-7xl mx-auto px-4 pt-20 pb-20 md:pt-28 md:pb-28">
