@@ -8,4 +8,5 @@ urlpatterns = [
     path("<uuid:listing_id>/images/", views.upload_listing_image, name="listing-images-upload"),
     path("<uuid:listing_id>/images/<uuid:image_id>/", views.delete_listing_image, name="listing-image-delete"),
     path("<uuid:listing_id>/save/", views.toggle_save, name="listing-save"),
+    path("<uuid:listing_id>/promote/", views.promote_listing, name="listing-promote"),
 ]

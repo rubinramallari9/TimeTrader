@@ -15,7 +15,6 @@ class UserAdmin(BaseUserAdmin):
         (None, {"fields": ("id", "email", "password")}),
         ("Personal Info", {"fields": ("username", "first_name", "last_name", "phone", "avatar_url")}),
         ("Role & Status", {"fields": ("role", "is_verified", "is_active", "is_staff", "is_superuser")}),
-        ("Payments", {"fields": ("stripe_customer_id",)}),
         ("Timestamps", {"fields": ("created_at", "updated_at")}),
     )
 

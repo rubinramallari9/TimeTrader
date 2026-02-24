@@ -1,6 +1,8 @@
 import uuid
+from datetime import timedelta
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 
 class Listing(models.Model):
@@ -41,6 +43,8 @@ class Listing(models.Model):
     description = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)
     is_authenticated = models.BooleanField(default=False)
+    is_featured = models.BooleanField(default=False)
+    featured_until = models.DateTimeField(null=True, blank=True)
     views_count = models.PositiveIntegerField(default=0)
     location_city = models.CharField(max_length=100, blank=True)
     location_country = models.CharField(max_length=100, blank=True)
@@ -83,6 +87,37 @@ class ListingImage(models.Model):
         if self.is_primary:
             ListingImage.objects.filter(listing=self.listing, is_primary=True).update(is_primary=False)
         super().save(*args, **kwargs)
+
+
+PROMOTION_PLANS = {
+    "basic":    {"label": "Basic",    "days": 7,  "price": "9.99"},
+    "featured": {"label": "Featured", "days": 30, "price": "24.99"},
+    "premium":  {"label": "Premium",  "days": 90, "price": "49.99"},
+}
+
+
+class ListingPromotion(models.Model):
+    class Plan(models.TextChoices):
+        BASIC    = "basic",    "Basic"
+        FEATURED = "featured", "Featured"
+        PREMIUM  = "premium",  "Premium"
+
+    id         = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    listing    = models.OneToOneField(Listing, on_delete=models.CASCADE, related_name="promotion")
+    plan       = models.CharField(max_length=20, choices=Plan.choices)
+    started_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_active  = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "listing_promotions"
+
+    def __str__(self):
+        return f"{self.listing} — {self.plan}"
+
+    @property
+    def is_expired(self):
+        return timezone.now() > self.expires_at
 
 
 class SavedListing(models.Model):

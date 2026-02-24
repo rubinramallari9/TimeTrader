@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Listing, ListingImage, SavedListing
+from .models import Listing, ListingImage, ListingPromotion, SavedListing, PROMOTION_PLANS
 from apps.users.serializers import UserPublicSerializer
 
 
@@ -58,6 +58,7 @@ class ListingDetailSerializer(serializers.ModelSerializer):
             "id", "title", "brand", "model", "reference_number", "year",
             "condition", "movement_type", "case_material", "case_diameter_mm",
             "price", "currency", "description", "status", "is_authenticated",
+            "is_featured", "featured_until",
             "location_city", "location_country", "views_count",
             "images", "seller", "is_saved", "created_at", "updated_at",
         )
@@ -67,6 +68,18 @@ class ListingDetailSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             return obj.saved_by.filter(user=request.user).exists()
         return False
+
+
+class ListingPromotionSerializer(serializers.ModelSerializer):
+    is_expired = serializers.BooleanField(read_only=True)
+    plan_label = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ListingPromotion
+        fields = ("id", "plan", "plan_label", "started_at", "expires_at", "is_active", "is_expired")
+
+    def get_plan_label(self, obj):
+        return PROMOTION_PLANS.get(obj.plan, {}).get("label", obj.plan)
 
 
 class CreateListingSerializer(serializers.ModelSerializer):

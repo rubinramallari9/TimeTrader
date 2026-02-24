@@ -172,9 +172,14 @@ export default function ListingDetailPage() {
               </button>
             )}
             {isOwner && (
-              <Link href={`/sell/edit/${listing.id}`} className="flex-1 text-center tt-btn-outline py-3 rounded-xl text-sm">
-                Edit Listing
-              </Link>
+              <div className="flex-1 flex gap-2">
+                <Link href={`/sell/edit/${listing.id}`} className="flex-1 text-center tt-btn-outline py-3 rounded-xl text-sm">
+                  Edit
+                </Link>
+                <Link href={`/sell/promote/${listing.id}`} className="flex-1 text-center tt-btn-gold py-3 rounded-xl text-sm">
+                  {listing.is_featured ? "Manage Promotion" : "Promote"}
+                </Link>
+              </div>
             )}
           </div>
 

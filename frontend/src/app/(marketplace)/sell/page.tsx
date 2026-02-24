@@ -95,7 +95,7 @@ export default function SellPage() {
         await listingsApi.uploadImage(listing.id, img);
       }
 
-      router.push(`/listings/${listing.id}`);
+      router.push(`/sell/promote/${listing.id}`);
     } catch (err) {
       const axiosErr = err as AxiosError<{ message?: string; fields?: Record<string, string[]> }>;
       const fields = axiosErr.response?.data?.fields;

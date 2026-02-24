@@ -7,10 +7,13 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 
-from .models import Listing, ListingImage, SavedListing
+from django.utils import timezone
+from datetime import timedelta
+from .models import Listing, ListingImage, ListingPromotion, SavedListing, PROMOTION_PLANS
 from .serializers import (
     ListingCardSerializer,
     ListingDetailSerializer,
+    ListingPromotionSerializer,
     CreateListingSerializer,
     UpdateListingSerializer,
     ListingImageSerializer,
@@ -150,6 +153,42 @@ def delete_listing_image(request, listing_id, image_id):
     img.image.delete(save=False)
     img.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def promote_listing(request, listing_id):
+    try:
+        listing = Listing.objects.get(id=listing_id, seller=request.user)
+    except Listing.DoesNotExist:
+        return Response({"error": "Listing not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        try:
+            promo = listing.promotion
+            return Response(ListingPromotionSerializer(promo).data)
+        except ListingPromotion.DoesNotExist:
+            return Response(None)
+
+    plan = request.data.get("plan")
+    if plan not in PROMOTION_PLANS:
+        return Response({"error": "Invalid plan. Choose: basic, featured, or premium."}, status=status.HTTP_400_BAD_REQUEST)
+
+    days = PROMOTION_PLANS[plan]["days"]
+    expires_at = timezone.now() + timedelta(days=days)
+
+    promo, created = ListingPromotion.objects.update_or_create(
+        listing=listing,
+        defaults={"plan": plan, "expires_at": expires_at, "is_active": True},
+    )
+    listing.is_featured = True
+    listing.featured_until = expires_at
+    listing.save(update_fields=["is_featured", "featured_until"])
+
+    return Response(
+        ListingPromotionSerializer(promo).data,
+        status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+    )
 
 
 @api_view(["POST", "DELETE"])

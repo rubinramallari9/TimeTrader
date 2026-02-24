@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { ListingCard, ListingDetail, CreateListingData, ListingFilters, PaginatedResponse, ListingImage } from "@/types";
+import { ListingCard, ListingDetail, CreateListingData, ListingFilters, PaginatedResponse, ListingImage, ListingPromotion, PromotionPlan } from "@/types";
 
 export const listingsApi = {
   list: (filters: ListingFilters = {}) => {
@@ -49,4 +49,10 @@ export const listingsApi = {
 
   getSaved: (page = 1) =>
     api.get<PaginatedResponse<ListingCard>>("/listings/saved/", { params: { page } }),
+
+  getPromotion: (id: string) =>
+    api.get<ListingPromotion | null>(`/listings/${id}/promote/`),
+
+  promote: (id: string, plan: PromotionPlan) =>
+    api.post<ListingPromotion>(`/listings/${id}/promote/`, { plan }),
 };

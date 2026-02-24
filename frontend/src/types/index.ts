@@ -11,7 +11,6 @@ export interface User {
   avatar_url: string;
   phone: string;
   is_verified: boolean;
-  stripe_customer_id: string;
   created_at: string;
   updated_at: string;
 }
@@ -50,6 +49,52 @@ export interface PaginatedResponse<T> {
   results: T[];
 }
 
+// ── Promotions ────────────────────────────────────────────
+
+export type PromotionPlan = "basic" | "featured" | "premium";
+
+export interface PromotionPlanInfo {
+  key: PromotionPlan;
+  label: string;
+  days: number;
+  price: string;
+  perks: string[];
+}
+
+export const PROMOTION_PLANS: PromotionPlanInfo[] = [
+  {
+    key: "basic",
+    label: "Basic Boost",
+    days: 7,
+    price: "9.99",
+    perks: ["Highlighted in search results", "Featured badge on listing", "7-day duration"],
+  },
+  {
+    key: "featured",
+    label: "Featured",
+    days: 30,
+    price: "24.99",
+    perks: ["Top placement in search", "Featured badge", "Listed in Featured section", "30-day duration"],
+  },
+  {
+    key: "premium",
+    label: "Premium",
+    days: 90,
+    price: "49.99",
+    perks: ["Homepage spotlight", "Priority search placement", "Premium badge", "Social media feature", "90-day duration"],
+  },
+];
+
+export interface ListingPromotion {
+  id: string;
+  plan: PromotionPlan;
+  plan_label: string;
+  started_at: string;
+  expires_at: string;
+  is_active: boolean;
+  is_expired: boolean;
+}
+
 // ── Listings ──────────────────────────────────────────────
 
 export type ListingCondition = "new" | "excellent" | "good" | "fair" | "poor";
@@ -74,6 +119,7 @@ export interface ListingCard {
   location_city: string;
   location_country: string;
   is_authenticated: boolean;
+  is_featured: boolean;
   primary_image: ListingImage | null;
   seller: PublicUser;
   is_saved: boolean;
@@ -89,6 +135,7 @@ export interface ListingDetail extends ListingCard {
   case_diameter_mm: string | null;
   description: string;
   status: ListingStatus;
+  featured_until: string | null;
   images: ListingImage[];
   updated_at: string;
 }

@@ -60,10 +60,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             "id", "email", "username", "full_name", "first_name", "last_name",
-            "role", "avatar_url", "phone", "is_verified", "stripe_customer_id",
+            "role", "avatar_url", "phone", "is_verified",
             "created_at", "updated_at",
         )
-        read_only_fields = ("id", "email", "role", "is_verified", "stripe_customer_id", "created_at", "updated_at")
+        read_only_fields = ("id", "email", "role", "is_verified", "created_at", "updated_at")
 
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
