@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path("", views.listings, name="listings"),
+    path("mine/", views.my_listings, name="my-listings"),
     path("saved/", views.saved_listings, name="listings-saved"),
     path("<uuid:listing_id>/", views.listing_detail, name="listing-detail"),
     path("<uuid:listing_id>/images/", views.upload_listing_image, name="listing-images-upload"),

@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { ListingCard, ListingDetail, CreateListingData, ListingFilters, PaginatedResponse, ListingImage, ListingPromotion, PromotionPlan } from "@/types";
+import { ListingCard, ListingDetail, MyListing, CreateListingData, ListingFilters, PaginatedResponse, ListingImage, ListingPromotion, PromotionPlan } from "@/types";
 
 export const listingsApi = {
   list: (filters: ListingFilters = {}) => {
@@ -45,6 +45,15 @@ export const listingsApi = {
 
   unsave: (id: string) =>
     api.delete<{ saved: boolean }>(`/listings/${id}/save/`),
+
+  mine: (status?: string) => {
+    const params: Record<string, string> = {};
+    if (status) params.status = status;
+    return api.get<PaginatedResponse<MyListing>>("/listings/mine/", { params });
+  },
+
+  markAsSold: (id: string) =>
+    api.patch<ListingDetail>(`/listings/${id}/`, { status: "sold" }),
 
   getSaved: (page = 1) =>
     api.get<PaginatedResponse<ListingCard>>("/listings/saved/", { params: { page } }),

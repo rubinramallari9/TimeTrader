@@ -82,6 +82,27 @@ class ListingPromotionSerializer(serializers.ModelSerializer):
         return PROMOTION_PLANS.get(obj.plan, {}).get("label", obj.plan)
 
 
+class MyListingSerializer(serializers.ModelSerializer):
+    """Serializer for the seller's own listings management view."""
+    primary_image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Listing
+        fields = (
+            "id", "title", "brand", "model", "condition", "price", "currency",
+            "status", "is_featured", "views_count", "primary_image",
+            "location_city", "location_country", "created_at", "updated_at",
+        )
+
+    def get_primary_image(self, obj):
+        img = obj.primary_image
+        if not img:
+            return None
+        request = self.context.get("request")
+        url = request.build_absolute_uri(img.image.url) if request else img.image.url
+        return {"id": str(img.id), "url": url, "is_primary": img.is_primary}
+
+
 class CreateListingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Listing

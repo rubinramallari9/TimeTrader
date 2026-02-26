@@ -14,6 +14,7 @@ from .serializers import (
     ListingCardSerializer,
     ListingDetailSerializer,
     ListingPromotionSerializer,
+    MyListingSerializer,
     CreateListingSerializer,
     UpdateListingSerializer,
     ListingImageSerializer,
@@ -205,6 +206,21 @@ def toggle_save(request, listing_id):
 
     SavedListing.objects.filter(user=request.user, listing=listing).delete()
     return Response({"saved": False})
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def my_listings(request):
+    qs = Listing.objects.filter(seller=request.user).prefetch_related("images").order_by("-created_at")
+
+    status_filter = request.GET.get("status")
+    if status_filter:
+        qs = qs.filter(status=status_filter)
+
+    paginator = ListingPagination()
+    page = paginator.paginate_queryset(qs, request)
+    serializer = MyListingSerializer(page, many=True, context={"request": request})
+    return paginator.get_paginated_response(serializer.data)
 
 
 @api_view(["GET"])

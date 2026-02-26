@@ -272,6 +272,24 @@ export interface Appointment {
   created_at: string;
 }
 
+export interface MyListing {
+  id: string;
+  title: string;
+  brand: string;
+  model: string;
+  condition: ListingCondition;
+  price: string;
+  currency: string;
+  status: ListingStatus;
+  is_featured: boolean;
+  views_count: number;
+  primary_image: ListingImage | null;
+  location_city: string;
+  location_country: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ListingFilters {
   search?: string;
   brand?: string;
