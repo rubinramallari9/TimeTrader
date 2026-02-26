@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ListingDetail } from "@/types";
 import { listingsApi } from "@/lib/listings-api";
+import { messagesApi } from "@/lib/messages-api";
 import { useAuthStore } from "@/store/auth";
 import { ConditionBadge, AuthBadge, VerifiedBadge } from "@/components/shared/Badge";
 
@@ -25,6 +26,9 @@ export default function ListingDetailPage() {
   const [activeImage, setActiveImage] = useState(0);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
+  const [contactMsg, setContactMsg] = useState("");
+  const [contacting, setContacting] = useState(false);
 
   useEffect(() => {
     listingsApi.get(id).then(({ data }) => {
@@ -32,6 +36,18 @@ export default function ListingDetailPage() {
       setSaved(data.is_saved);
     }).catch(() => router.push("/listings")).finally(() => setLoading(false));
   }, [id, router]);
+
+  const handleContact = async () => {
+    if (!user) { router.push(`/login?from=/listings/${id}`); return; }
+    if (!contactMsg.trim() || contacting || !listing) return;
+    setContacting(true);
+    try {
+      const { data } = await messagesApi.start(listing.id, contactMsg.trim());
+      router.push(`/messages/${data.id}`);
+    } finally {
+      setContacting(false);
+    }
+  };
 
   const toggleSave = async () => {
     if (!user || saving || !listing) return;
@@ -151,7 +167,10 @@ export default function ListingDetailPage() {
           {/* Actions */}
           <div className="flex gap-3 mb-8">
             {!isOwner && (
-              <button className="flex-1 tt-btn-gold py-3 rounded-xl text-sm">
+              <button
+                onClick={() => user ? setContactOpen(true) : router.push(`/login?from=/listings/${id}`)}
+                className="flex-1 tt-btn-gold py-3 rounded-xl text-sm"
+              >
                 Contact Seller
               </button>
             )}
@@ -223,6 +242,42 @@ export default function ListingDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Contact Seller modal */}
+      {contactOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setContactOpen(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <h2 className="text-lg font-bold text-[#0E1520] mb-1">Message Seller</h2>
+            <p className="text-xs text-[#9E9585] mb-4">
+              About: <span className="font-medium text-[#0E1520]">{listing.brand} {listing.model}</span>
+            </p>
+            <textarea
+              autoFocus
+              value={contactMsg}
+              onChange={(e) => setContactMsg(e.target.value)}
+              placeholder={`Hi, I'm interested in your ${listing.brand} ${listing.model}. Is it still available?`}
+              rows={4}
+              className="w-full border border-[#EDE9E3] rounded-xl px-4 py-3 text-sm text-[#0E1520] placeholder-[#C8C0B0] focus:outline-none focus:ring-2 focus:ring-[#B09145] resize-none mb-4"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => setContactOpen(false)}
+                className="flex-1 tt-btn-outline py-2.5 rounded-xl text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleContact}
+                disabled={!contactMsg.trim() || contacting}
+                className="flex-1 tt-btn-gold py-2.5 rounded-xl text-sm disabled:opacity-50"
+              >
+                {contacting ? "Sending…" : "Send Message"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

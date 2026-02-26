@@ -157,6 +157,33 @@ export interface CreateListingData {
   location_country?: string;
 }
 
+// ── Messaging ─────────────────────────────────────────────
+
+export interface Message {
+  id: string;
+  sender: PublicUser;
+  content: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface Conversation {
+  id: string;
+  listing_id: string;
+  listing_title: string;
+  listing_brand: string;
+  buyer: PublicUser;
+  seller: PublicUser;
+  last_message: { content: string; sender_id: string; created_at: string } | null;
+  unread_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ConversationDetail extends Conversation {
+  messages: Message[];
+}
+
 // ── Stores ────────────────────────────────────────────────
 
 export interface StoreCard {
