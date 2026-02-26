@@ -42,7 +42,6 @@ class Listing(models.Model):
     currency = models.CharField(max_length=3, default="USD")
     description = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)
-    is_authenticated = models.BooleanField(default=False)
     is_featured = models.BooleanField(default=False)
     featured_until = models.DateTimeField(null=True, blank=True)
     views_count = models.PositiveIntegerField(default=0)

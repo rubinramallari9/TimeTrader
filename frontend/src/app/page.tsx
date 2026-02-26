@@ -19,15 +19,6 @@ const TRUST = [
   {
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.955 11.955 0 003 12c0 6.627 5.373 12 12 12a11.955 11.955 0 006-1.598M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-    title: "AI-Powered Authentication",
-    body: "Every listing can be independently verified by our Gemini Vision AI. Get a certified authenticity report in minutes.",
-  },
-  {
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
       </svg>
     ),
@@ -37,11 +28,20 @@ const TRUST = [
   {
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
       </svg>
     ),
-    title: "Secure Transactions",
-    body: "Stripe-powered escrow payments protect both buyers and sellers. Funds are only released once you confirm delivery.",
+    title: "Direct Communication",
+    body: "Message sellers directly and get all the details you need before committing. No intermediaries, no delays.",
+  },
+  {
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    title: "Trusted Community",
+    body: "A curated marketplace of serious collectors and dealers. Detailed listings, honest descriptions, and real photos.",
   },
 ];
 
@@ -52,7 +52,7 @@ export default function HomePage() {
 
   useEffect(() => {
     listingsApi.list({ sort: "-created_at" })
-      .then(({ data }) => setFeatured(data.results.slice(0, 6)))
+      .then(({ data }) => setFeatured(data.results.slice(0, 3)))
       .catch(() => {});
   }, []);
 
@@ -87,7 +87,7 @@ export default function HomePage() {
               </h1>
 
               <p className="text-[#9E9585] text-base sm:text-lg max-w-xl mb-10 leading-relaxed">
-                Buy and sell certified pre-owned luxury watches from verified sellers worldwide. Every piece backed by AI authentication.
+                Buy and sell pre-owned luxury watches from verified sellers worldwide. Connect directly, browse thousands of pieces, and trade with confidence.
               </p>
 
               <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2 max-w-xl mb-10">
@@ -182,8 +182,8 @@ export default function HomePage() {
         </div>
 
         {featured.length === 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {Array.from({ length: 6 }).map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="bg-white rounded-2xl border border-[#EDE9E3] overflow-hidden animate-pulse">
                 <div className="aspect-square bg-[#F0EDE8]" />
                 <div className="p-4 space-y-2">
@@ -195,7 +195,7 @@ export default function HomePage() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {featured.map((listing) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
@@ -278,7 +278,7 @@ export default function HomePage() {
               Your Watch Deserves<br className="hidden sm:block" /> the Right Audience
             </h2>
             <p className="text-[#9E9585] text-sm max-w-md">
-              List in minutes. Reach thousands of serious collectors worldwide. Our AI authentication gives buyers the confidence to pay full price.
+              List in minutes. Reach thousands of serious collectors worldwide. Verified sellers, direct messaging, and a community that takes watches seriously.
             </p>
           </div>
           <div className="flex gap-3 flex-shrink-0">
@@ -324,7 +324,6 @@ export default function HomePage() {
                 {[
                   { href: "/stores", label: "Watch Stores" },
                   { href: "/repairs", label: "Repair Shops" },
-                  { href: "/authenticate", label: "Authenticate" },
                 ].map((l) => (
                   <li key={l.href}>
                     <Link href={l.href} className="text-xs text-[#9E9585] hover:text-[#B09145] transition-colors">{l.label}</Link>
@@ -353,10 +352,19 @@ export default function HomePage() {
             <p className="text-[11px] text-[#4A5568]">
               © {new Date().getFullYear()} TimeTrader. All rights reserved.
             </p>
-            <div className="flex gap-5">
+            <div className="flex items-center gap-5">
               {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((t) => (
                 <Link key={t} href="#" className="text-[11px] text-[#4A5568] hover:text-[#9E9585] transition-colors">{t}</Link>
               ))}
+              <span className="text-[#1E2D40]">·</span>
+              <a
+                href="https://averon.agency"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] text-[#4A5568] hover:text-[#B09145] transition-colors"
+              >
+                Built by <span className="font-semibold">Averon Agency</span>
+              </a>
             </div>
           </div>
         </div>

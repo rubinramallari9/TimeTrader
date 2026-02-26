@@ -172,7 +172,6 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Third-party API keys
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
 # Internationalization
 LANGUAGE_CODE = "en-us"

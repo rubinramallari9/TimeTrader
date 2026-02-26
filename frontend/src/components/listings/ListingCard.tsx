@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { ListingCard as ListingCardType } from "@/types";
-import { ConditionBadge, AuthBadge } from "@/components/shared/Badge";
+import { ConditionBadge } from "@/components/shared/Badge";
 import { listingsApi } from "@/lib/listings-api";
 import { useAuthStore } from "@/store/auth";
 
@@ -79,12 +79,7 @@ export default function ListingCard({ listing }: Props) {
             </button>
           )}
 
-          {/* Auth badge overlay */}
-          {listing.is_authenticated && (
-            <div className="absolute top-3 left-3">
-              <AuthBadge />
-            </div>
-          )}
+
         </div>
 
         {/* Info */}

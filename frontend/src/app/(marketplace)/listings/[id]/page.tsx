@@ -8,7 +8,7 @@ import { ListingDetail } from "@/types";
 import { listingsApi } from "@/lib/listings-api";
 import { messagesApi } from "@/lib/messages-api";
 import { useAuthStore } from "@/store/auth";
-import { ConditionBadge, AuthBadge, VerifiedBadge } from "@/components/shared/Badge";
+import { ConditionBadge, VerifiedBadge } from "@/components/shared/Badge";
 
 const MOVEMENT_LABELS: Record<string, string> = {
   automatic: "Automatic",
@@ -155,7 +155,6 @@ export default function ListingDetailPage() {
         <div>
           <div className="flex items-center gap-2 flex-wrap mb-2">
             <p className="tt-brand-name">{listing.brand}</p>
-            {listing.is_authenticated && <AuthBadge />}
             <ConditionBadge condition={listing.condition} />
           </div>
 

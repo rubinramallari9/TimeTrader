@@ -10,7 +10,6 @@ export const listingsApi = {
     if (filters.max_price) params.max_price = filters.max_price;
     if (filters.city) params.city = filters.city;
     if (filters.country) params.country = filters.country;
-    if (filters.is_authenticated !== undefined) params.is_authenticated = filters.is_authenticated;
     if (filters.sort) params.sort = filters.sort;
     if (filters.page) params.page = filters.page;
     if (filters.condition?.length) params.condition = filters.condition.join(",");

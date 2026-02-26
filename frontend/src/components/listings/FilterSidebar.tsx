@@ -110,22 +110,6 @@ export default function FilterSidebar({ filters, onChange, onClear }: Props) {
         </div>
       </div>
 
-      {/* Authenticated only */}
-      <div className="border border-[#EDE9E3] rounded-xl p-3">
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={filters.is_authenticated ?? false}
-            onChange={(e) => onChange({ ...filters, is_authenticated: e.target.checked || undefined })}
-            className="rounded border-[#C8C0B0] text-[#B09145] focus:ring-[#B09145]"
-          />
-          <div>
-            <span className="text-sm font-medium text-[#0E1520] block">Certified only</span>
-            <span className="text-[10px] text-[#9E9585]">AI-authenticated watches</span>
-          </div>
-        </label>
-      </div>
-
       {/* Location */}
       <div>
         <p className="text-[10px] font-semibold tracking-[0.12em] uppercase text-[#9E9585] mb-2">Location</p>

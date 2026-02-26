@@ -118,7 +118,6 @@ export interface ListingCard {
   currency: string;
   location_city: string;
   location_country: string;
-  is_authenticated: boolean;
   is_featured: boolean;
   primary_image: ListingImage | null;
   seller: PublicUser;
@@ -282,7 +281,6 @@ export interface ListingFilters {
   max_price?: number;
   city?: string;
   country?: string;
-  is_authenticated?: boolean;
   sort?: string;
   page?: number;
 }

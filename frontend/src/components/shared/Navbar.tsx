@@ -10,7 +10,6 @@ const NAV_LINKS = [
   { href: "/listings", label: "Browse" },
   { href: "/stores", label: "Stores" },
   { href: "/repairs", label: "Repairs" },
-  { href: "/authenticate", label: "Authenticate" },
 ];
 
 export default function Navbar() {
@@ -61,7 +60,7 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/listings" className="flex items-center gap-2 group">
+        <Link href="/" className="flex items-center gap-2 group">
           <span className="font-display italic text-2xl text-white tracking-tight group-hover:text-[#C8A96E] transition-colors">
             TimeTrader
           </span>

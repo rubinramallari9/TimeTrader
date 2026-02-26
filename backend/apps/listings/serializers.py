@@ -27,7 +27,7 @@ class ListingCardSerializer(serializers.ModelSerializer):
         model = Listing
         fields = (
             "id", "title", "brand", "model", "condition", "price", "currency",
-            "location_city", "location_country", "is_authenticated",
+            "location_city", "location_country",
             "primary_image", "seller", "is_saved", "views_count", "created_at",
         )
 
@@ -57,7 +57,7 @@ class ListingDetailSerializer(serializers.ModelSerializer):
         fields = (
             "id", "title", "brand", "model", "reference_number", "year",
             "condition", "movement_type", "case_material", "case_diameter_mm",
-            "price", "currency", "description", "status", "is_authenticated",
+            "price", "currency", "description", "status",
             "is_featured", "featured_until",
             "location_city", "location_country", "views_count",
             "images", "seller", "is_saved", "created_at", "updated_at",
