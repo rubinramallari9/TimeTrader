@@ -46,15 +46,23 @@ class LoginSerializer(serializers.Serializer):
 class UserPublicSerializer(serializers.ModelSerializer):
     """Safe public profile — no sensitive fields."""
     full_name = serializers.CharField(read_only=True)
+    avatar_url = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ("id", "username", "full_name", "avatar_url", "role", "is_verified", "created_at")
 
+    def get_avatar_url(self, obj):
+        if not obj.avatar:
+            return None
+        request = self.context.get("request")
+        return request.build_absolute_uri(obj.avatar.url) if request else obj.avatar.url
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
     """Full profile for the authenticated user."""
     full_name = serializers.CharField(read_only=True)
+    avatar_url = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -65,11 +73,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ("id", "email", "role", "is_verified", "created_at", "updated_at")
 
+    def get_avatar_url(self, obj):
+        if not obj.avatar:
+            return None
+        request = self.context.get("request")
+        return request.build_absolute_uri(obj.avatar.url) if request else obj.avatar.url
+
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("username", "first_name", "last_name", "phone", "avatar_url")
+        fields = ("username", "first_name", "last_name", "phone")
 
     def validate_username(self, value):
         user = self.context["request"].user

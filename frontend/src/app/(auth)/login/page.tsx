@@ -38,7 +38,9 @@ function LoginForm() {
     setServerError(null);
     try {
       await login(data.email, data.password);
-      router.push(from);
+      const { user } = useAuthStore.getState();
+      if (user?.role === "store" && from === "/listings") router.push("/dashboard/store");
+      else router.push(from);
     } catch (err) {
       const axiosErr = err as AxiosError<{ message?: string; non_field_errors?: string[] }>;
       const msg =

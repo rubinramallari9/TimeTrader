@@ -6,13 +6,18 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Q
 
-from .models import Store, StoreImage, Review
+from django.utils import timezone
+from datetime import timedelta
+
+from .models import Store, StoreImage, StorePromotion, Review, STORE_PROMOTION_PLANS
 from .serializers import (
-    StoreCardSerializer, StoreDetailSerializer,
+    StoreCardSerializer, StoreDetailSerializer, StorePromotionSerializer,
     CreateUpdateStoreSerializer, ReviewSerializer, CreateReviewSerializer,
 )
 from apps.users.models import User
 from apps.users.permissions import IsOwnerOrAdmin
+from apps.listings.models import Listing
+from apps.listings.serializers import MyListingSerializer
 
 
 class StorePagination(PageNumberPagination):
@@ -96,6 +101,68 @@ def upload_store_logo(request, slug):
     store.logo = logo
     store.save(update_fields=["logo"])
     return Response(StoreDetailSerializer(store, context={"request": request}).data)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def my_store(request):
+    try:
+        store = Store.objects.get(owner=request.user)
+    except Store.DoesNotExist:
+        return Response({"error": "No store profile found."}, status=status.HTTP_404_NOT_FOUND)
+    return Response(StoreDetailSerializer(store, context={"request": request}).data)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def store_listings(request, slug):
+    try:
+        store = Store.objects.get(slug=slug)
+    except Store.DoesNotExist:
+        return Response({"error": "Store not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    qs = Listing.objects.filter(
+        seller=store.owner,
+        status=Listing.Status.ACTIVE,
+    ).prefetch_related("images").order_by("-created_at")
+
+    paginator = StorePagination()
+    page = paginator.paginate_queryset(qs, request)
+    from apps.listings.serializers import ListingCardSerializer
+    serializer = ListingCardSerializer(page, many=True, context={"request": request})
+    return paginator.get_paginated_response(serializer.data)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def store_promote(request, slug):
+    try:
+        store = Store.objects.get(slug=slug, owner=request.user)
+    except Store.DoesNotExist:
+        return Response({"error": "Store not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        try:
+            promo = store.promotion
+            return Response(StorePromotionSerializer(promo).data)
+        except StorePromotion.DoesNotExist:
+            return Response(None)
+
+    plan = request.data.get("plan")
+    if plan not in STORE_PROMOTION_PLANS:
+        return Response({"error": "Invalid plan."}, status=status.HTTP_400_BAD_REQUEST)
+
+    days = STORE_PROMOTION_PLANS[plan]["days"]
+    expires = timezone.now() + timedelta(days=days)
+
+    promo, _ = StorePromotion.objects.update_or_create(
+        store=store,
+        defaults={"plan": plan, "expires_at": expires, "is_active": True},
+    )
+    store.is_featured = True
+    store.save(update_fields=["is_featured"])
+
+    return Response(StorePromotionSerializer(promo).data, status=status.HTTP_201_CREATED)
 
 
 @api_view(["GET", "POST"])

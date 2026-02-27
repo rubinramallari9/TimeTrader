@@ -183,6 +183,45 @@ export interface ConversationDetail extends Conversation {
   messages: Message[];
 }
 
+// ── Store Promotions ───────────────────────────────────────
+
+export type StorePromotionPlan = "spotlight" | "featured";
+
+export interface StorePromotionPlanInfo {
+  key: StorePromotionPlan;
+  label: string;
+  days: number;
+  price: string;
+  perks: string[];
+}
+
+export const STORE_PROMOTION_PLANS: StorePromotionPlanInfo[] = [
+  {
+    key: "spotlight",
+    label: "Spotlight",
+    days: 30,
+    price: "19.99",
+    perks: ["Featured badge in directory", "Higher placement in search", "30-day duration"],
+  },
+  {
+    key: "featured",
+    label: "Featured",
+    days: 90,
+    price: "49.99",
+    perks: ["Top placement in directory", "Featured badge + homepage exposure", "Priority search ranking", "90-day duration"],
+  },
+];
+
+export interface StorePromotion {
+  id: string;
+  plan: StorePromotionPlan;
+  plan_label: string;
+  started_at: string;
+  expires_at: string;
+  is_active: boolean;
+  is_expired: boolean;
+}
+
 // ── Stores ────────────────────────────────────────────────
 
 export interface StoreCard {

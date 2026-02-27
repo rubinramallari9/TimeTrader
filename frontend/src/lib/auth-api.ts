@@ -37,8 +37,16 @@ export const authApi = {
 export const usersApi = {
   getMe: () => api.get<User>("/users/me/"),
 
-  updateMe: (data: Partial<Pick<User, "username" | "first_name" | "last_name" | "phone" | "avatar_url">>) =>
+  updateMe: (data: Partial<Pick<User, "username" | "first_name" | "last_name" | "phone">>) =>
     api.patch<User>("/users/me/", data),
+
+  uploadAvatar: (file: File) => {
+    const form = new FormData();
+    form.append("avatar", file);
+    return api.post<User>("/users/me/avatar/", form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
 
   changePassword: (data: { current_password: string; new_password: string; new_password_confirm: string }) =>
     api.post("/users/me/password/", data),

@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { StoreCard, StoreDetail, Review, PaginatedResponse } from "@/types";
+import { StoreCard, StoreDetail, StorePromotion, StorePromotionPlan, Review, PaginatedResponse, ListingCard } from "@/types";
 
 export const storesApi = {
   list: (params?: { search?: string; city?: string; country?: string; featured?: boolean; page?: number }) =>
@@ -7,6 +7,9 @@ export const storesApi = {
 
   get: (slug: string) =>
     api.get<StoreDetail>(`/stores/${slug}/`),
+
+  mine: () =>
+    api.get<StoreDetail>("/stores/mine/"),
 
   create: (data: Partial<StoreDetail>) =>
     api.post<StoreDetail>("/stores/", data),
@@ -21,6 +24,15 @@ export const storesApi = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
+
+  getListings: (slug: string, page = 1) =>
+    api.get<PaginatedResponse<ListingCard>>(`/stores/${slug}/listings/`, { params: { page } }),
+
+  getPromotion: (slug: string) =>
+    api.get<StorePromotion | null>(`/stores/${slug}/promote/`),
+
+  promote: (slug: string, plan: StorePromotionPlan) =>
+    api.post<StorePromotion>(`/stores/${slug}/promote/`, { plan }),
 
   getReviews: (slug: string, page = 1) =>
     api.get<PaginatedResponse<Review>>(`/stores/${slug}/reviews/`, { params: { page } }),

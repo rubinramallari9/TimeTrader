@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Store, StoreImage, Review
+from .models import Store, StoreImage, StorePromotion, Review, STORE_PROMOTION_PLANS
 from apps.users.serializers import UserPublicSerializer
 
 
@@ -77,6 +77,18 @@ class StoreDetailSerializer(serializers.ModelSerializer):
             return None
         request = self.context.get("request")
         return request.build_absolute_uri(obj.logo.url) if request else obj.logo.url
+
+
+class StorePromotionSerializer(serializers.ModelSerializer):
+    is_expired = serializers.BooleanField(read_only=True)
+    plan_label = serializers.SerializerMethodField()
+
+    class Meta:
+        model = StorePromotion
+        fields = ("id", "plan", "plan_label", "started_at", "expires_at", "is_active", "is_expired")
+
+    def get_plan_label(self, obj):
+        return STORE_PROMOTION_PLANS.get(obj.plan, {}).get("label", obj.plan)
 
 
 class CreateUpdateStoreSerializer(serializers.ModelSerializer):

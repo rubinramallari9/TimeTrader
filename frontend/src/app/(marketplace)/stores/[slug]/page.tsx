@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { StoreDetail, Review } from "@/types";
+import { StoreDetail, Review, ListingCard as ListingCardType } from "@/types";
 import { storesApi } from "@/lib/stores-api";
 import { useAuthStore } from "@/store/auth";
 import StarRating from "@/components/shared/StarRating";
 import { VerifiedBadge } from "@/components/shared/Badge";
+import ListingCard from "@/components/listings/ListingCard";
 
 const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 const DAY_LABELS: Record<string, string> = { mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday", sun: "Sunday" };
@@ -19,6 +20,7 @@ export default function StoreDetailPage() {
   const { user } = useAuthStore();
   const [store, setStore] = useState<StoreDetail | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [storeListings, setStoreListings] = useState<ListingCardType[]>([]);
   const [loading, setLoading] = useState(true);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewContent, setReviewContent] = useState("");
@@ -26,8 +28,12 @@ export default function StoreDetailPage() {
   const [reviewError, setReviewError] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([storesApi.get(slug), storesApi.getReviews(slug)])
-      .then(([{ data: s }, { data: r }]) => { setStore(s); setReviews(r.results); })
+    Promise.all([storesApi.get(slug), storesApi.getReviews(slug), storesApi.getListings(slug)])
+      .then(([{ data: s }, { data: r }, { data: l }]) => {
+        setStore(s);
+        setReviews(r.results);
+        setStoreListings(l.results);
+      })
       .catch(() => router.push("/stores"))
       .finally(() => setLoading(false));
   }, [slug, router]);
@@ -88,8 +94,8 @@ export default function StoreDetailPage() {
             <p className="text-sm text-gray-500 mt-1">{[store.city, store.country].filter(Boolean).join(", ")}</p>
           </div>
           {isOwner && (
-            <Link href={`/dashboard/store`} className="text-sm border border-gray-200 px-4 py-2 rounded-lg hover:border-gray-900 transition-colors">
-              Edit Store
+            <Link href="/dashboard/store" className="text-sm border border-[#EDE9E3] px-4 py-2 rounded-lg hover:border-[#B09145] text-[#9E9585] hover:text-[#B09145] transition-colors whitespace-nowrap">
+              Manage Store
             </Link>
           )}
         </div>
@@ -114,6 +120,18 @@ export default function StoreDetailPage() {
                 <span className="text-gray-500">{DAY_LABELS[d]}</span>
                 <span className="font-medium text-gray-900">{store.opening_hours[d]}</span>
               </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Watches */}
+      {storeListings.length > 0 && (
+        <div className="bg-white rounded-2xl border border-[#EDE9E3] p-4 sm:p-6 mb-6">
+          <h2 className="font-semibold text-[#0E1520] mb-4">Watches for Sale ({storeListings.length})</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {storeListings.map((listing) => (
+              <ListingCard key={listing.id} listing={listing} />
             ))}
           </div>
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useAuthStore } from "@/store/auth";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -114,8 +115,12 @@ export default function Navbar() {
                   onClick={() => setUserMenuOpen((o) => !o)}
                   className="flex items-center gap-2"
                 >
-                  <div className="w-8 h-8 rounded-full bg-[#B09145] flex items-center justify-center text-xs font-bold uppercase text-white">
-                    {user.username[0]}
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-[#B09145] flex items-center justify-center text-xs font-bold uppercase text-white flex-shrink-0">
+                    {user.avatar_url ? (
+                      <Image src={user.avatar_url} alt={user.username} width={32} height={32} className="w-full h-full object-cover" />
+                    ) : (
+                      user.username[0]
+                    )}
                   </div>
                 </button>
                 {userMenuOpen && (
@@ -128,6 +133,9 @@ export default function Navbar() {
                     <Link href="/listings/saved" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2.5 text-xs text-[#9E9585] hover:text-white hover:bg-white/5 transition-colors">Saved Watches</Link>
                     {(user.role === "seller" || user.role === "store" || user.role === "admin") && (
                       <Link href="/sell/listings" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2.5 text-xs text-[#9E9585] hover:text-white hover:bg-white/5 transition-colors">My Listings</Link>
+                    )}
+                    {(user.role === "store" || user.role === "admin") && (
+                      <Link href="/dashboard/store" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2.5 text-xs text-[#9E9585] hover:text-white hover:bg-white/5 transition-colors">My Store</Link>
                     )}
                     <hr className="my-1 border-[#1E2D40]" />
                     <button onClick={handleLogout} className="w-full text-left px-4 py-2.5 text-xs text-red-400 hover:text-red-300 hover:bg-white/5 transition-colors">

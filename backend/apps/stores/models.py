@@ -1,7 +1,14 @@
 import uuid
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 from django.utils.text import slugify
+
+
+STORE_PROMOTION_PLANS = {
+    "spotlight": {"label": "Spotlight", "days": 30,  "price": "19.99"},
+    "featured":  {"label": "Featured",  "days": 90,  "price": "49.99"},
+}
 
 
 class Store(models.Model):
@@ -65,6 +72,29 @@ class StoreImage(models.Model):
     class Meta:
         db_table = "store_images"
         ordering = ["order"]
+
+
+class StorePromotion(models.Model):
+    class Plan(models.TextChoices):
+        SPOTLIGHT = "spotlight", "Spotlight"
+        FEATURED  = "featured",  "Featured"
+
+    id         = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    store      = models.OneToOneField(Store, on_delete=models.CASCADE, related_name="promotion")
+    plan       = models.CharField(max_length=20, choices=Plan.choices)
+    started_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_active  = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "store_promotions"
+
+    def __str__(self):
+        return f"{self.store} — {self.plan}"
+
+    @property
+    def is_expired(self):
+        return timezone.now() > self.expires_at
 
 
 class Review(models.Model):
