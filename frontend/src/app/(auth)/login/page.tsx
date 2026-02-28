@@ -10,7 +10,7 @@ import { useAuthStore } from "@/store/auth";
 import { AxiosError } from "axios";
 
 const schema = z.object({
-  email: z.string().email("Enter a valid email"),
+  email: z.string().min(1, "Enter your email or username"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -65,13 +65,13 @@ function LoginForm() {
         )}
 
         <div>
-          <label className={labelCls}>Email</label>
+          <label className={labelCls}>Email or Username</label>
           <input
             {...register("email")}
-            type="email"
-            autoComplete="email"
+            type="text"
+            autoComplete="username"
             className={inputCls}
-            placeholder="you@example.com"
+            placeholder="you@example.com or watchcollector42"
           />
           {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email.message}</p>}
         </div>

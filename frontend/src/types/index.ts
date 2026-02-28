@@ -20,6 +20,7 @@ export interface PublicUser {
   username: string;
   full_name: string;
   avatar_url: string;
+  phone: string;
   role: UserRole;
   is_verified: boolean;
   created_at: string;

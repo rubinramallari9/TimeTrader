@@ -26,6 +26,7 @@ const schema = z
     username:         z.string().min(3, "At least 3 characters").max(30, "Max 30 characters").regex(/^\w+$/, "Only letters, numbers, underscores"),
     first_name:       z.string().min(1, "Required"),
     last_name:        z.string().min(1, "Required"),
+    phone:            z.string().min(1, "Required"),
     role:             z.enum(["buyer", "seller", "store", "repair"] as const),
     password:         z.string().min(8, "At least 8 characters"),
     password_confirm: z.string(),
@@ -207,6 +208,12 @@ export default function RegisterPage() {
           <label className={labelCls}>Email</label>
           <input {...register("email")} type="email" autoComplete="email" className={inputCls} />
           {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email.message}</p>}
+        </div>
+
+        <div>
+          <label className={labelCls}>Phone <span className="text-red-500">*</span></label>
+          <input {...register("phone")} type="tel" placeholder="+1 (555) 000-0000" className={inputCls} />
+          {errors.phone && <p className="text-xs text-red-400 mt-1">{errors.phone.message}</p>}
         </div>
 
         <div>

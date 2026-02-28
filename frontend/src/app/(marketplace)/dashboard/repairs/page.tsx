@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
 import { repairsApi } from "@/lib/repairs-api";
-import { RepairShopDetail, RepairService, RepairShowcase } from "@/types";
+import { RepairShopDetail, RepairService, RepairShowcase, Appointment } from "@/types";
 
 const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 const DAY_LABELS: Record<string, string> = {
@@ -17,7 +17,7 @@ const inputCls =
   "w-full border border-[#EDE9E3] rounded-lg px-4 py-3 text-sm text-[#0E1520] placeholder-[#C8C0B0] focus:outline-none focus:ring-2 focus:ring-[#B09145] focus:border-transparent transition-shadow bg-white";
 const labelCls = "block text-[10px] font-semibold tracking-[0.12em] uppercase text-[#9E9585] mb-1.5";
 
-type Tab = "overview" | "services" | "showcase" | "settings";
+type Tab = "overview" | "appointments" | "services" | "showcase" | "settings";
 
 export default function RepairsDashboardPage() {
   const router = useRouter();
@@ -48,6 +48,12 @@ export default function RepairsDashboardPage() {
   const [serviceForm, setServiceForm] = useState({ name: "", description: "", price_from: "", price_to: "", duration_days: "" });
   const [serviceError, setServiceError] = useState<string | null>(null);
   const [serviceLoading, setServiceLoading] = useState(false);
+
+  // Appointments state
+  const [appointments, setAppointments]       = useState<Appointment[]>([]);
+  const [apptLoading, setApptLoading]         = useState(false);
+  const [apptLoaded, setApptLoaded]           = useState(false);
+  const [updatingAppt, setUpdatingAppt]       = useState<string | null>(null);
 
   // Settings state
   const [settingsForm, setSettingsForm] = useState({
@@ -87,6 +93,30 @@ export default function RepairsDashboardPage() {
       .catch(() => router.push("/repairs"))
       .finally(() => setLoading(false));
   }, [isInitialized, user, router]);
+
+  // Load appointments when the tab is first activated
+  useEffect(() => {
+    if (activeTab !== "appointments" || apptLoaded || !shop) return;
+    setApptLoading(true);
+    repairsApi.getAppointments(shop.slug)
+      .then(({ data }) => { setAppointments(data.results); setApptLoaded(true); })
+      .catch(() => {})
+      .finally(() => setApptLoading(false));
+  }, [activeTab, apptLoaded, shop]);
+
+  // ── Appointment status update ─────────────────────────────
+  const updateApptStatus = async (appt: Appointment, newStatus: string) => {
+    if (!shop) return;
+    setUpdatingAppt(appt.id);
+    try {
+      const { data } = await repairsApi.updateAppointmentStatus(shop.slug, appt.id, newStatus);
+      setAppointments((a) => a.map((x) => (x.id === data.id ? data : x)));
+    } catch {
+      alert("Failed to update status.");
+    } finally {
+      setUpdatingAppt(null);
+    }
+  };
 
   // ── Logo upload ──────────────────────────────────────────
   const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -248,10 +278,11 @@ export default function RepairsDashboardPage() {
   const logoSrc = logoPreview ?? shop.logo_url;
 
   const TABS: { key: Tab; label: string }[] = [
-    { key: "overview", label: "Overview" },
-    { key: "services", label: "Services" },
-    { key: "showcase", label: "Showcase" },
-    { key: "settings", label: "Settings" },
+    { key: "overview",     label: "Overview" },
+    { key: "appointments", label: "Appointments" },
+    { key: "services",     label: "Services" },
+    { key: "showcase",     label: "Showcase" },
+    { key: "settings",     label: "Settings" },
   ];
 
   return (
@@ -304,19 +335,29 @@ export default function RepairsDashboardPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 border-b border-[#EDE9E3] mb-6">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setActiveTab(t.key)}
-            className={`px-5 py-2.5 text-xs font-semibold tracking-[0.08em] uppercase transition-colors border-b-2 -mb-px ${
-              activeTab === t.key
-                ? "border-[#B09145] text-[#B09145]"
-                : "border-transparent text-[#9E9585] hover:text-[#0E1520]"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+        {TABS.map((t) => {
+          const pendingCount = t.key === "appointments"
+            ? appointments.filter((a) => a.status === "pending").length
+            : 0;
+          return (
+            <button
+              key={t.key}
+              onClick={() => setActiveTab(t.key)}
+              className={`relative px-5 py-2.5 text-xs font-semibold tracking-[0.08em] uppercase transition-colors border-b-2 -mb-px ${
+                activeTab === t.key
+                  ? "border-[#B09145] text-[#B09145]"
+                  : "border-transparent text-[#9E9585] hover:text-[#0E1520]"
+              }`}
+            >
+              {t.label}
+              {pendingCount > 0 && (
+                <span className="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#B09145] text-white text-[9px] font-bold">
+                  {pendingCount}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {/* ── Overview tab ──────────────────────────────────── */}
@@ -339,6 +380,20 @@ export default function RepairsDashboardPage() {
           {/* Quick actions */}
           <div className="bg-white border border-[#EDE9E3] rounded-2xl p-6 space-y-3">
             <p className="text-[10px] font-semibold tracking-[0.12em] uppercase text-[#9E9585] mb-4">Quick Actions</p>
+            <button
+              onClick={() => setActiveTab("appointments")}
+              className="w-full text-left flex items-center gap-3 p-3 rounded-xl border border-[#EDE9E3] hover:border-[#B09145] hover:bg-[#B09145]/5 transition-all group"
+            >
+              <div className="w-8 h-8 rounded-lg bg-[#F0EDE8] flex items-center justify-center group-hover:bg-[#B09145]/10 transition-colors">
+                <svg className="w-4 h-4 text-[#B09145]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[#0E1520]">View Appointments</p>
+                <p className="text-xs text-[#9E9585]">Manage booking requests from customers</p>
+              </div>
+            </button>
             <button
               onClick={() => { setActiveTab("services"); openAddService(); }}
               className="w-full text-left flex items-center gap-3 p-3 rounded-xl border border-[#EDE9E3] hover:border-[#B09145] hover:bg-[#B09145]/5 transition-all group"
@@ -369,6 +424,108 @@ export default function RepairsDashboardPage() {
               </div>
             </button>
           </div>
+        </div>
+      )}
+
+      {/* ── Appointments tab ──────────────────────────────── */}
+      {activeTab === "appointments" && (
+        <div>
+          {apptLoading ? (
+            <div className="space-y-3 animate-pulse">
+              {[1, 2, 3].map((i) => <div key={i} className="h-20 bg-[#EDE9E3] rounded-2xl" />)}
+            </div>
+          ) : appointments.length === 0 ? (
+            <div className="bg-white border border-[#EDE9E3] rounded-2xl py-14 px-8 text-center">
+              <div className="w-12 h-12 rounded-2xl bg-[#F0EDE8] flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-[#C8C0B0]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                </svg>
+              </div>
+              <p className="font-semibold text-[#0E1520] mb-1">No appointments yet</p>
+              <p className="text-sm text-[#9E9585]">When customers book appointments they will appear here.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {appointments.map((appt) => {
+                const STATUS_STYLES: Record<string, string> = {
+                  pending:   "bg-amber-50 text-amber-700 border-amber-200",
+                  confirmed: "bg-blue-50 text-blue-700 border-blue-200",
+                  completed: "bg-emerald-50 text-emerald-700 border-emerald-200",
+                  cancelled: "bg-red-50 text-red-500 border-red-200",
+                };
+                const isUpdating = updatingAppt === appt.id;
+                return (
+                  <div key={appt.id} className="bg-white border border-[#EDE9E3] rounded-2xl p-5">
+                    <div className="flex items-start justify-between gap-4 flex-wrap">
+                      {/* Left: customer + details */}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-semibold text-sm text-[#0E1520]">
+                            {appt.customer.full_name || appt.customer.username}
+                          </p>
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${STATUS_STYLES[appt.status] ?? ""}`}>
+                            {appt.status.charAt(0).toUpperCase() + appt.status.slice(1)}
+                          </span>
+                        </div>
+                        <p className="text-xs text-[#9E9585]">
+                          {new Date(appt.scheduled_at).toLocaleString(undefined, {
+                            weekday: "short", year: "numeric", month: "short",
+                            day: "numeric", hour: "2-digit", minute: "2-digit",
+                          })}
+                        </p>
+                        {appt.service && (
+                          <p className="text-xs text-[#B09145] mt-0.5">{appt.service.name}</p>
+                        )}
+                        {appt.customer.phone && (
+                          <a
+                            href={`tel:${appt.customer.phone}`}
+                            className="inline-flex items-center gap-1 text-xs text-[#B09145] hover:text-[#C8A96E] mt-1 transition-colors"
+                          >
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                            </svg>
+                            {appt.customer.phone}
+                          </a>
+                        )}
+                        {appt.notes && (
+                          <p className="text-xs text-[#9E9585] mt-1 italic">&ldquo;{appt.notes}&rdquo;</p>
+                        )}
+                      </div>
+
+                      {/* Right: status actions */}
+                      {appt.status === "pending" && (
+                        <div className="flex gap-2 flex-shrink-0">
+                          <button
+                            disabled={isUpdating}
+                            onClick={() => updateApptStatus(appt, "confirmed")}
+                            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors disabled:opacity-50"
+                          >
+                            Confirm
+                          </button>
+                          <button
+                            disabled={isUpdating}
+                            onClick={() => updateApptStatus(appt, "cancelled")}
+                            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-50 text-red-500 border border-red-200 hover:bg-red-100 transition-colors disabled:opacity-50"
+                          >
+                            Decline
+                          </button>
+                        </div>
+                      )}
+                      {appt.status === "confirmed" && (
+                        <button
+                          disabled={isUpdating}
+                          onClick={() => updateApptStatus(appt, "completed")}
+                          className="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg bg-[#B09145]/10 text-[#B09145] border border-[#B09145]/20 hover:bg-[#B09145]/20 transition-colors disabled:opacity-50"
+                        >
+                          Mark Complete
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 

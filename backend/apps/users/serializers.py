@@ -10,7 +10,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("email", "username", "password", "password_confirm", "first_name", "last_name", "role")
+        fields = ("email", "username", "password", "password_confirm", "first_name", "last_name", "role", "phone")
         extra_kwargs = {
             "first_name": {"required": False},
             "last_name": {"required": False},
@@ -30,13 +30,26 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
+    email = serializers.CharField()  # accepts email or username
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        user = authenticate(username=attrs["email"], password=attrs["password"])
+        login = attrs["email"].strip()
+        password = attrs["password"]
+
+        # Try email first, then username
+        user = None
+        if "@" in login:
+            user = authenticate(username=login, password=password)
         if not user:
-            raise serializers.ValidationError("Invalid email or password.")
+            try:
+                matched = User.objects.get(username__iexact=login)
+                user = authenticate(username=matched.email, password=password)
+            except User.DoesNotExist:
+                pass
+
+        if not user:
+            raise serializers.ValidationError("Invalid credentials.")
         if not user.is_active:
             raise serializers.ValidationError("This account has been deactivated.")
         attrs["user"] = user
@@ -50,7 +63,7 @@ class UserPublicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "username", "full_name", "avatar_url", "role", "is_verified", "created_at")
+        fields = ("id", "username", "full_name", "avatar_url", "phone", "role", "is_verified", "created_at")
 
     def get_avatar_url(self, obj):
         if not obj.avatar:
