@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuthStore } from "@/store/auth";
 import { storesApi } from "@/lib/stores-api";
+import { repairsApi } from "@/lib/repairs-api";
 import { AxiosError } from "axios";
 
 type PublicRole = "buyer" | "seller" | "store" | "repair";
@@ -57,6 +58,16 @@ export default function RegisterPage() {
   const [storeCountry,     setStoreCountry]     = useState("");
   const [storeNameError,   setStoreNameError]   = useState<string | null>(null);
 
+  // Repair-specific fields
+  const [repairName,        setRepairName]        = useState("");
+  const [repairDescription, setRepairDescription] = useState("");
+  const [repairPhone,       setRepairPhone]       = useState("");
+  const [repairEmail,       setRepairEmail]       = useState("");
+  const [repairAddress,     setRepairAddress]     = useState("");
+  const [repairCity,        setRepairCity]        = useState("");
+  const [repairCountry,     setRepairCountry]     = useState("");
+  const [repairNameError,   setRepairNameError]   = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -73,10 +84,16 @@ export default function RegisterPage() {
   const onSubmit = async (data: FormData) => {
     setServerError(null);
     setStoreNameError(null);
+    setRepairNameError(null);
 
     // Validate store name if store role
     if (data.role === "store" && !storeName.trim()) {
       setStoreNameError("Store name is required.");
+      return;
+    }
+    // Validate repair shop name if repair role
+    if (data.role === "repair" && !repairName.trim()) {
+      setRepairNameError("Shop name is required.");
       return;
     }
 
@@ -100,6 +117,21 @@ export default function RegisterPage() {
           // Account created — send to dashboard anyway, they can fill in details
         }
         router.push("/dashboard/store");
+      } else if (data.role === "repair") {
+        try {
+          await repairsApi.create({
+            name:        repairName.trim(),
+            description: repairDescription,
+            phone:       repairPhone,
+            email:       repairEmail || data.email,
+            address:     repairAddress,
+            city:        repairCity,
+            country:     repairCountry,
+          });
+        } catch {
+          // Account created — send to dashboard anyway
+        }
+        router.push("/dashboard/repairs");
       } else {
         router.push("/listings");
       }
@@ -289,6 +321,95 @@ export default function RegisterPage() {
           </div>
         )}
 
+        {/* ── Repair shop details (only shown when repair role is selected) ── */}
+        {selectedRole === "repair" && (
+          <div className="border-t border-[#1E2D40] pt-4 space-y-4">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.12em] uppercase text-[#B09145] mb-3">Repair Shop Details</p>
+            </div>
+
+            <div>
+              <label className={labelCls}>Shop Name <span className="text-red-500">*</span></label>
+              <input
+                type="text"
+                value={repairName}
+                onChange={(e) => setRepairName(e.target.value)}
+                placeholder="e.g. Precision Watch Service"
+                className={inputCls}
+              />
+              {repairNameError && <p className="text-xs text-red-400 mt-1">{repairNameError}</p>}
+            </div>
+
+            <div>
+              <label className={labelCls}>Description</label>
+              <textarea
+                rows={3}
+                value={repairDescription}
+                onChange={(e) => setRepairDescription(e.target.value)}
+                placeholder="Services you offer, brands you work with, years of experience..."
+                className={`${inputCls} resize-none`}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelCls}>Phone</label>
+                <input
+                  type="tel"
+                  value={repairPhone}
+                  onChange={(e) => setRepairPhone(e.target.value)}
+                  placeholder="+1 (555) 000-0000"
+                  className={inputCls}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Business Email</label>
+                <input
+                  type="email"
+                  value={repairEmail}
+                  onChange={(e) => setRepairEmail(e.target.value)}
+                  placeholder="service@shop.com"
+                  className={inputCls}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className={labelCls}>Address</label>
+              <input
+                type="text"
+                value={repairAddress}
+                onChange={(e) => setRepairAddress(e.target.value)}
+                placeholder="123 Main Street"
+                className={inputCls}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelCls}>City</label>
+                <input
+                  type="text"
+                  value={repairCity}
+                  onChange={(e) => setRepairCity(e.target.value)}
+                  placeholder="New York"
+                  className={inputCls}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Country</label>
+                <input
+                  type="text"
+                  value={repairCountry}
+                  onChange={(e) => setRepairCountry(e.target.value)}
+                  placeholder="United States"
+                  className={inputCls}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         <button
           type="submit"
           disabled={isLoading}
@@ -298,6 +419,8 @@ export default function RegisterPage() {
             ? "Creating account..."
             : selectedRole === "store"
             ? "Create Account & Store"
+            : selectedRole === "repair"
+            ? "Create Account & Repair Shop"
             : "Create account"}
         </button>
       </form>

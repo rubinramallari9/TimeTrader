@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { RepairShopCard, RepairShopDetail, RepairService, Appointment, Review, PaginatedResponse } from "@/types";
+import { RepairShopCard, RepairShopDetail, RepairService, RepairShowcase, Appointment, Review, PaginatedResponse } from "@/types";
 
 export const repairsApi = {
   list: (params?: { search?: string; city?: string; country?: string; featured?: boolean; page?: number }) =>
@@ -40,4 +40,26 @@ export const repairsApi = {
 
   postReview: (slug: string, data: { rating: number; content: string }) =>
     api.post<Review>(`/repairs/${slug}/reviews/`, data),
+
+  mine: () =>
+    api.get<RepairShopDetail>("/repairs/mine/"),
+
+  getShowcase: (slug: string) =>
+    api.get<RepairShowcase[]>(`/repairs/${slug}/showcase/`),
+
+  addShowcase: (slug: string, formData: FormData) =>
+    api.post<RepairShowcase>(`/repairs/${slug}/showcase/`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
+
+  deleteShowcase: (slug: string, itemId: string) =>
+    api.delete(`/repairs/${slug}/showcase/${itemId}/`),
+
+  uploadLogo: (file: File) => {
+    const fd = new FormData();
+    fd.append("logo", file);
+    return api.post<RepairShopDetail>("/repairs/mine/logo/", fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
 };

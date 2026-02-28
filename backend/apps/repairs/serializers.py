@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import RepairShop, RepairService, Appointment, RepairReview
+from .models import RepairShop, RepairService, Appointment, RepairReview, RepairShowcase
 from apps.users.serializers import UserPublicSerializer
 
 
@@ -85,6 +85,38 @@ class CreateUpdateRepairShopSerializer(serializers.ModelSerializer):
             "name", "description", "phone", "email",
             "address", "city", "country", "latitude", "longitude", "opening_hours",
         )
+
+
+class RepairShowcaseSerializer(serializers.ModelSerializer):
+    before_image_url = serializers.SerializerMethodField()
+    after_image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RepairShowcase
+        fields = (
+            "id", "title", "description",
+            "before_image_url", "after_image_url",
+            "watch_brand", "watch_model", "created_at",
+        )
+        read_only_fields = ("id", "created_at", "before_image_url", "after_image_url")
+
+    def get_before_image_url(self, obj):
+        if not obj.before_image:
+            return None
+        request = self.context.get("request")
+        return request.build_absolute_uri(obj.before_image.url) if request else obj.before_image.url
+
+    def get_after_image_url(self, obj):
+        if not obj.after_image:
+            return None
+        request = self.context.get("request")
+        return request.build_absolute_uri(obj.after_image.url) if request else obj.after_image.url
+
+
+class RepairShowcaseWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RepairShowcase
+        fields = ("title", "description", "before_image", "after_image", "watch_brand", "watch_model")
 
 
 class AppointmentSerializer(serializers.ModelSerializer):

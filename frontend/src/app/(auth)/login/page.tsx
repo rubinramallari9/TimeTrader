@@ -40,6 +40,7 @@ function LoginForm() {
       await login(data.email, data.password);
       const { user } = useAuthStore.getState();
       if (user?.role === "store" && from === "/listings") router.push("/dashboard/store");
+      else if (user?.role === "repair" && from === "/listings") router.push("/dashboard/repairs");
       else router.push(from);
     } catch (err) {
       const axiosErr = err as AxiosError<{ message?: string; non_field_errors?: string[] }>;

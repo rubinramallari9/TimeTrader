@@ -99,6 +99,25 @@ class Appointment(models.Model):
         return f"{self.customer} @ {self.shop.name} — {self.scheduled_at:%Y-%m-%d}"
 
 
+class RepairShowcase(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    shop = models.ForeignKey(RepairShop, on_delete=models.CASCADE, related_name="showcase_items")
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    before_image = models.ImageField(upload_to="repairs/showcase/")
+    after_image = models.ImageField(upload_to="repairs/showcase/", null=True, blank=True)
+    watch_brand = models.CharField(max_length=100, blank=True)
+    watch_model = models.CharField(max_length=100, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "repair_showcase"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.shop.name} — {self.title}"
+
+
 class RepairReview(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(

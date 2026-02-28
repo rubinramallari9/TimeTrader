@@ -6,12 +6,13 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Q
 
-from .models import RepairShop, RepairService, Appointment, RepairReview
+from .models import RepairShop, RepairService, Appointment, RepairReview, RepairShowcase
 from .serializers import (
     RepairShopCardSerializer, RepairShopDetailSerializer,
     CreateUpdateRepairShopSerializer, RepairServiceSerializer,
     AppointmentSerializer, CreateAppointmentSerializer,
     RepairReviewSerializer, CreateRepairReviewSerializer,
+    RepairShowcaseSerializer, RepairShowcaseWriteSerializer,
 )
 from apps.users.models import User
 from apps.users.permissions import IsOwnerOrAdmin
@@ -163,6 +164,66 @@ def appointment_detail(request, slug, appt_id):
     appt.status = new_status
     appt.save(update_fields=["status"])
     return Response(AppointmentSerializer(appt).data)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def my_repair_shop(request):
+    try:
+        shop = RepairShop.objects.prefetch_related("services").get(owner=request.user)
+    except RepairShop.DoesNotExist:
+        return Response({"error": "No repair shop found."}, status=status.HTTP_404_NOT_FOUND)
+    return Response(RepairShopDetailSerializer(shop, context={"request": request}).data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def upload_repair_logo(request):
+    try:
+        shop = RepairShop.objects.get(owner=request.user)
+    except RepairShop.DoesNotExist:
+        return Response({"error": "No repair shop found."}, status=status.HTTP_404_NOT_FOUND)
+    logo = request.FILES.get("logo")
+    if not logo:
+        return Response({"error": "No file provided."}, status=status.HTTP_400_BAD_REQUEST)
+    shop.logo = logo
+    shop.save(update_fields=["logo"])
+    return Response(RepairShopDetailSerializer(shop, context={"request": request}).data)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([AllowAny])
+@parser_classes([MultiPartParser, FormParser])
+def repair_showcase(request, slug):
+    try:
+        shop = RepairShop.objects.get(slug=slug)
+    except RepairShop.DoesNotExist:
+        return Response({"error": "Repair shop not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        items = shop.showcase_items.all()
+        return Response(RepairShowcaseSerializer(items, many=True, context={"request": request}).data)
+
+    if not request.user.is_authenticated or shop.owner != request.user:
+        return Response({"error": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+
+    serializer = RepairShowcaseWriteSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    item = serializer.save(shop=shop)
+    return Response(RepairShowcaseSerializer(item, context={"request": request}).data, status=status.HTTP_201_CREATED)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def repair_showcase_detail(request, slug, item_id):
+    try:
+        shop = RepairShop.objects.get(slug=slug, owner=request.user)
+        item = shop.showcase_items.get(id=item_id)
+    except (RepairShop.DoesNotExist, RepairShowcase.DoesNotExist):
+        return Response({"error": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+    item.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(["GET", "POST"])

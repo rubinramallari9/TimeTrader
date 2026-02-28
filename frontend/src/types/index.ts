@@ -300,6 +300,17 @@ export interface RepairShopDetail extends RepairShopCard {
   updated_at: string;
 }
 
+export interface RepairShowcase {
+  id: string;
+  title: string;
+  description: string;
+  before_image_url: string;
+  after_image_url: string | null;
+  watch_brand: string;
+  watch_model: string;
+  created_at: string;
+}
+
 export interface Appointment {
   id: string;
   shop: string;
