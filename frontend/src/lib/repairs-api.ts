@@ -47,6 +47,9 @@ export const repairsApi = {
   getShowcase: (slug: string) =>
     api.get<RepairShowcase[]>(`/repairs/${slug}/showcase/`),
 
+  getShowcaseItem: (slug: string, itemId: string) =>
+    api.get<RepairShowcase>(`/repairs/${slug}/showcase/${itemId}/`),
+
   addShowcase: (slug: string, formData: FormData) =>
     api.post<RepairShowcase>(`/repairs/${slug}/showcase/`, formData, {
       headers: { "Content-Type": "multipart/form-data" },

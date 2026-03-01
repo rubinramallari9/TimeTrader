@@ -288,16 +288,20 @@ export default function RepairShopDetailPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {showcase.map((item) => (
-              <div key={item.id} className="bg-white border border-[#EDE9E3] rounded-2xl overflow-hidden">
+              <Link
+                key={item.id}
+                href={`/repairs/${slug}/showcase/${item.id}`}
+                className="bg-white border border-[#EDE9E3] rounded-2xl overflow-hidden hover:border-[#B09145] hover:shadow-md transition-all group"
+              >
                 <div className="grid grid-cols-2">
-                  <div className="relative aspect-square">
-                    <Image src={item.before_image_url} alt={`Before — ${item.title}`} fill className="object-cover" />
+                  <div className="relative aspect-square overflow-hidden">
+                    <Image src={item.before_image_url} alt={`Before — ${item.title}`} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
                     <span className="absolute top-2 left-2 text-[9px] font-bold uppercase tracking-wider bg-black/50 text-white px-1.5 py-0.5 rounded">Before</span>
                   </div>
-                  <div className="relative aspect-square bg-[#F0EDE8] flex items-center justify-center">
+                  <div className="relative aspect-square bg-[#F0EDE8] flex items-center justify-center overflow-hidden">
                     {item.after_image_url ? (
                       <>
-                        <Image src={item.after_image_url} alt={`After — ${item.title}`} fill className="object-cover" />
+                        <Image src={item.after_image_url} alt={`After — ${item.title}`} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
                         <span className="absolute top-2 left-2 text-[9px] font-bold uppercase tracking-wider bg-[#B09145]/80 text-white px-1.5 py-0.5 rounded">After</span>
                       </>
                     ) : (
@@ -306,15 +310,16 @@ export default function RepairShopDetailPage() {
                   </div>
                 </div>
                 <div className="p-4">
-                  <p className="font-semibold text-sm text-[#0E1520]">{item.title}</p>
+                  <p className="font-semibold text-sm text-[#0E1520] group-hover:text-[#B09145] transition-colors">{item.title}</p>
                   {(item.watch_brand || item.watch_model) && (
-                    <p className="text-xs text-[#B09145] mt-0.5">{[item.watch_brand, item.watch_model].filter(Boolean).join(" ")}</p>
+                    <p className="text-xs text-[#B09145] mt-0.5">{[item.watch_brand, item.watch_model].filter(Boolean).join(" · ")}</p>
                   )}
                   {item.description && (
                     <p className="text-xs text-[#9E9585] mt-1 line-clamp-2">{item.description}</p>
                   )}
+                  <p className="text-[10px] text-[#C8C0B0] mt-2 group-hover:text-[#B09145] transition-colors">View details →</p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

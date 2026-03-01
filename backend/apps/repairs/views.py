@@ -214,14 +214,20 @@ def repair_showcase(request, slug):
     return Response(RepairShowcaseSerializer(item, context={"request": request}).data, status=status.HTTP_201_CREATED)
 
 
-@api_view(["DELETE"])
-@permission_classes([IsAuthenticated])
+@api_view(["GET", "DELETE"])
+@permission_classes([AllowAny])
 def repair_showcase_detail(request, slug, item_id):
     try:
-        shop = RepairShop.objects.get(slug=slug, owner=request.user)
+        shop = RepairShop.objects.get(slug=slug)
         item = shop.showcase_items.get(id=item_id)
     except (RepairShop.DoesNotExist, RepairShowcase.DoesNotExist):
         return Response({"error": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        return Response(RepairShowcaseSerializer(item, context={"request": request}).data)
+
+    if not request.user.is_authenticated or shop.owner != request.user:
+        return Response({"error": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
     item.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
