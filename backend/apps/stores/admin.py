@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Store, StoreImage, Review
+from .models import Store, StoreImage, Review, StorePromotion
 
 
 class StoreImageInline(admin.TabularInline):
@@ -20,3 +20,11 @@ class StoreAdmin(admin.ModelAdmin):
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ("store", "author", "rating", "created_at")
     list_filter = ("rating",)
+
+
+@admin.register(StorePromotion)
+class StorePromotionAdmin(admin.ModelAdmin):
+    list_display = ("store", "plan", "started_at", "expires_at", "is_active", "is_expired")
+    list_filter = ("plan", "is_active")
+    search_fields = ("store__name", "store__owner__email")
+    readonly_fields = ("id", "started_at", "is_expired")

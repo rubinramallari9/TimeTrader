@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
 import { repairsApi } from "@/lib/repairs-api";
-import { RepairShopDetail, RepairService, RepairShowcase, Appointment } from "@/types";
+import { RepairShopDetail, RepairService, RepairShowcase, RepairPromotion, Appointment, REPAIR_PROMOTION_PLANS } from "@/types";
 
 const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 const DAY_LABELS: Record<string, string> = {
@@ -17,7 +17,7 @@ const inputCls =
   "w-full border border-[#EDE9E3] rounded-lg px-4 py-3 text-sm text-[#0E1520] placeholder-[#C8C0B0] focus:outline-none focus:ring-2 focus:ring-[#B09145] focus:border-transparent transition-shadow bg-white";
 const labelCls = "block text-[10px] font-semibold tracking-[0.12em] uppercase text-[#9E9585] mb-1.5";
 
-type Tab = "overview" | "appointments" | "services" | "showcase" | "settings";
+type Tab = "overview" | "appointments" | "services" | "showcase" | "advertise" | "settings";
 
 export default function RepairsDashboardPage() {
   const router = useRouter();
@@ -55,6 +55,11 @@ export default function RepairsDashboardPage() {
   const [apptLoaded, setApptLoaded]           = useState(false);
   const [updatingAppt, setUpdatingAppt]       = useState<string | null>(null);
 
+  // Advertise state
+  const [promo, setPromo]                   = useState<RepairPromotion | null>(null);
+  const [activatingPlan, setActivatingPlan] = useState<string | null>(null);
+  const [promoSuccess, setPromoSuccess]     = useState(false);
+
   // Settings state
   const [settingsForm, setSettingsForm] = useState({
     name: "", description: "", phone: "", email: "", address: "", city: "", country: "",
@@ -79,6 +84,7 @@ export default function RepairsDashboardPage() {
         setShop(data);
         setServices(data.services ?? []);
         repairsApi.getShowcase(data.slug).then(({ data: s }) => setShowcase(s)).catch(() => {});
+        repairsApi.getPromotion(data.slug).then(({ data: p }) => setPromo(p ?? null)).catch(() => {});
         setSettingsForm({
           name:        data.name ?? "",
           description: data.description ?? "",
@@ -215,6 +221,20 @@ export default function RepairsDashboardPage() {
     }
   };
 
+  // ── Advertise ────────────────────────────────────────────
+  const handleActivatePlan = async (plan: string) => {
+    if (!shop || activatingPlan) return;
+    setActivatingPlan(plan);
+    try {
+      const { data } = await repairsApi.promote(shop.slug, plan as "1m" | "3m" | "6m");
+      setPromo(data);
+      setPromoSuccess(true);
+      setTimeout(() => setPromoSuccess(false), 4000);
+    } finally {
+      setActivatingPlan(null);
+    }
+  };
+
   // ── Showcase helpers ─────────────────────────────────────
   const pickFile = (which: "before" | "after", file: File) => {
     const url = URL.createObjectURL(file);
@@ -277,11 +297,16 @@ export default function RepairsDashboardPage() {
 
   const logoSrc = logoPreview ?? shop.logo_url;
 
+  const promoActive = promo && !promo.is_expired;
+  const formatDate  = (iso: string) =>
+    new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
   const TABS: { key: Tab; label: string }[] = [
     { key: "overview",     label: "Overview" },
     { key: "appointments", label: "Appointments" },
     { key: "services",     label: "Services" },
     { key: "showcase",     label: "Showcase" },
+    { key: "advertise",    label: "Advertise" },
     { key: "settings",     label: "Settings" },
   ];
 
@@ -406,6 +431,20 @@ export default function RepairsDashboardPage() {
               <div>
                 <p className="text-sm font-semibold text-[#0E1520]">Add a Service</p>
                 <p className="text-xs text-[#9E9585]">List what repair services you offer</p>
+              </div>
+            </button>
+            <button
+              onClick={() => setActiveTab("advertise")}
+              className="w-full text-left flex items-center gap-3 p-3 rounded-xl border border-[#EDE9E3] hover:border-[#B09145] hover:bg-[#B09145]/5 transition-all group"
+            >
+              <div className="w-8 h-8 rounded-lg bg-[#F0EDE8] flex items-center justify-center group-hover:bg-[#B09145]/10 transition-colors">
+                <svg className="w-4 h-4 text-[#B09145]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 010 1.954l-7.108 4.061A1.125 1.125 0 013 16.811V8.69zM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 010 1.954l-7.108 4.061a1.125 1.125 0 01-1.683-.977V8.69z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[#0E1520]">Advertise Shop</p>
+                <p className="text-xs text-[#9E9585]">{promoActive ? `Featured until ${formatDate(promo!.expires_at)}` : "Get featured in directory"}</p>
               </div>
             </button>
             <button
@@ -857,6 +896,68 @@ export default function RepairsDashboardPage() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── Advertise tab ─────────────────────────────────── */}
+      {activeTab === "advertise" && (
+        <div>
+          {promoSuccess && (
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-5 py-3 mb-6 text-sm font-medium">
+              Promotion activated. Your repair shop is now featured in the directory.
+            </div>
+          )}
+
+          {promoActive && (
+            <div className="bg-white border border-[#EDE9E3] rounded-2xl p-5 mb-6 flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-[#0E1520]">Current plan: {promo!.plan_label}</p>
+                <p className="text-xs text-[#9E9585] mt-0.5">Active until {formatDate(promo!.expires_at)}</p>
+              </div>
+              <span className="text-[10px] font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Active</span>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {REPAIR_PROMOTION_PLANS.map((plan) => {
+              const isCurrent = !!(promoActive && promo!.plan === plan.key);
+              return (
+                <div key={plan.key} className={`relative bg-white border rounded-2xl p-5 flex flex-col ${isCurrent ? "border-[#B09145] ring-1 ring-[#B09145]/30" : "border-[#EDE9E3]"}`}>
+                  {plan.key === "3m" && (
+                    <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-[#B09145] text-white text-[9px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-full whitespace-nowrap">
+                      Best Value
+                    </span>
+                  )}
+                  <div className="mb-3">
+                    <p className="text-xs font-bold text-[#9E9585] mb-1">{plan.label}</p>
+                    <p className="text-2xl font-bold text-[#0E1520]">{plan.price}€</p>
+                    <p className="text-[10px] text-[#9E9585] mt-0.5">{plan.days} days</p>
+                  </div>
+                  <ul className="space-y-1.5 mb-5 flex-1">
+                    {plan.perks.map((perk) => (
+                      <li key={perk} className="flex items-start gap-1.5 text-[11px] text-[#4A5568]">
+                        <svg className="w-3.5 h-3.5 text-[#B09145] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        {perk}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => handleActivatePlan(plan.key)}
+                    disabled={!!activatingPlan || isCurrent}
+                    className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                      isCurrent
+                        ? "bg-[#B09145]/10 text-[#B09145] cursor-default"
+                        : "tt-btn-gold hover:opacity-90 disabled:opacity-50"
+                    }`}
+                  >
+                    {isCurrent ? "Current Plan" : activatingPlan === plan.key ? "Activating…" : "Activate"}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 

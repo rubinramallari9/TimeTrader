@@ -12,5 +12,8 @@ urlpatterns = [
     path("<slug:slug>/appointments/<uuid:appt_id>/", views.appointment_detail, name="repair-appointment-detail"),
     path("<slug:slug>/showcase/", views.repair_showcase, name="repair-showcase"),
     path("<slug:slug>/showcase/<uuid:item_id>/", views.repair_showcase_detail, name="repair-showcase-detail"),
+    path("<slug:slug>/promote/", views.repair_promote, name="repair-promote"),
+    path("<slug:slug>/promote/create-order/", views.repair_promote_create_order, name="repair-promote-create-order"),
+    path("<slug:slug>/promote/capture-order/", views.repair_promote_capture_order, name="repair-promote-capture-order"),
     path("<slug:slug>/reviews/", views.repair_reviews, name="repair-reviews"),
 ]

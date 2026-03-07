@@ -10,6 +10,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django.utils import timezone
 from datetime import timedelta
 from .models import Listing, ListingImage, ListingPromotion, SavedListing, PROMOTION_PLANS
+from config.paypal_utils import create_order as paypal_create_order, capture_order as paypal_capture_order
 from .serializers import (
     ListingCardSerializer,
     ListingDetailSerializer,
@@ -174,6 +175,66 @@ def promote_listing(request, listing_id):
     plan = request.data.get("plan")
     if plan not in PROMOTION_PLANS:
         return Response({"error": "Invalid plan. Choose: basic, featured, or premium."}, status=status.HTTP_400_BAD_REQUEST)
+
+    days = PROMOTION_PLANS[plan]["days"]
+    expires_at = timezone.now() + timedelta(days=days)
+
+    promo, created = ListingPromotion.objects.update_or_create(
+        listing=listing,
+        defaults={"plan": plan, "expires_at": expires_at, "is_active": True},
+    )
+    listing.is_featured = True
+    listing.featured_until = expires_at
+    listing.save(update_fields=["is_featured", "featured_until"])
+
+    return Response(
+        ListingPromotionSerializer(promo).data,
+        status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+    )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def listing_promote_create_order(request, listing_id):
+    try:
+        listing = Listing.objects.get(id=listing_id, seller=request.user)
+    except Listing.DoesNotExist:
+        return Response({"error": "Listing not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    plan = request.data.get("plan")
+    if plan not in PROMOTION_PLANS:
+        return Response({"error": "Invalid plan."}, status=status.HTTP_400_BAD_REQUEST)
+
+    price = PROMOTION_PLANS[plan]["price"]
+    description = f"{listing.brand} {listing.model} — {PROMOTION_PLANS[plan]['label']} Promotion"
+
+    try:
+        order = paypal_create_order(price, description)
+        return Response({"order_id": order["id"]})
+    except Exception:
+        return Response({"error": "Failed to create payment order."}, status=status.HTTP_502_BAD_GATEWAY)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def listing_promote_capture_order(request, listing_id):
+    try:
+        listing = Listing.objects.get(id=listing_id, seller=request.user)
+    except Listing.DoesNotExist:
+        return Response({"error": "Listing not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    order_id = request.data.get("order_id")
+    plan = request.data.get("plan")
+
+    if not order_id or plan not in PROMOTION_PLANS:
+        return Response({"error": "Missing order_id or invalid plan."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        capture = paypal_capture_order(order_id)
+        if capture.get("status") != "COMPLETED":
+            return Response({"error": "Payment not completed."}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception:
+        return Response({"error": "Payment capture failed."}, status=status.HTTP_502_BAD_GATEWAY)
 
     days = PROMOTION_PLANS[plan]["days"]
     expires_at = timezone.now() + timedelta(days=days)

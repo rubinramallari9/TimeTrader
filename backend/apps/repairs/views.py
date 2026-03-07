@@ -5,14 +5,18 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Q
+from django.utils import timezone
+from datetime import timedelta
 
-from .models import RepairShop, RepairService, Appointment, RepairReview, RepairShowcase
+from .models import RepairShop, RepairService, Appointment, RepairReview, RepairShowcase, RepairPromotion, REPAIR_PROMOTION_PLANS
+from config.paypal_utils import create_order as paypal_create_order, capture_order as paypal_capture_order
 from .serializers import (
     RepairShopCardSerializer, RepairShopDetailSerializer,
     CreateUpdateRepairShopSerializer, RepairServiceSerializer,
     AppointmentSerializer, CreateAppointmentSerializer,
     RepairReviewSerializer, CreateRepairReviewSerializer,
     RepairShowcaseSerializer, RepairShowcaseWriteSerializer,
+    RepairPromotionSerializer,
 )
 from apps.users.models import User
 from apps.users.permissions import IsOwnerOrAdmin
@@ -230,6 +234,94 @@ def repair_showcase_detail(request, slug, item_id):
         return Response({"error": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
     item.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def repair_promote(request, slug):
+    try:
+        shop = RepairShop.objects.get(slug=slug, owner=request.user)
+    except RepairShop.DoesNotExist:
+        return Response({"error": "Repair shop not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        try:
+            promo = shop.promotion
+            return Response(RepairPromotionSerializer(promo).data)
+        except RepairPromotion.DoesNotExist:
+            return Response(None)
+
+    plan = request.data.get("plan")
+    if plan not in REPAIR_PROMOTION_PLANS:
+        return Response({"error": "Invalid plan."}, status=status.HTTP_400_BAD_REQUEST)
+
+    days = REPAIR_PROMOTION_PLANS[plan]["days"]
+    expires = timezone.now() + timedelta(days=days)
+
+    promo, _ = RepairPromotion.objects.update_or_create(
+        shop=shop,
+        defaults={"plan": plan, "expires_at": expires, "is_active": True},
+    )
+    shop.is_featured = True
+    shop.save(update_fields=["is_featured"])
+
+    return Response(RepairPromotionSerializer(promo).data, status=status.HTTP_201_CREATED)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def repair_promote_create_order(request, slug):
+    try:
+        shop = RepairShop.objects.get(slug=slug, owner=request.user)
+    except RepairShop.DoesNotExist:
+        return Response({"error": "Repair shop not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    plan = request.data.get("plan")
+    if plan not in REPAIR_PROMOTION_PLANS:
+        return Response({"error": "Invalid plan."}, status=status.HTTP_400_BAD_REQUEST)
+
+    price = REPAIR_PROMOTION_PLANS[plan]["price"]
+    description = f"{shop.name} — {REPAIR_PROMOTION_PLANS[plan]['label']} Repair Shop Promotion"
+
+    try:
+        order = paypal_create_order(price, description)
+        return Response({"order_id": order["id"]})
+    except Exception:
+        return Response({"error": "Failed to create payment order."}, status=status.HTTP_502_BAD_GATEWAY)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def repair_promote_capture_order(request, slug):
+    try:
+        shop = RepairShop.objects.get(slug=slug, owner=request.user)
+    except RepairShop.DoesNotExist:
+        return Response({"error": "Repair shop not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    order_id = request.data.get("order_id")
+    plan = request.data.get("plan")
+
+    if not order_id or plan not in REPAIR_PROMOTION_PLANS:
+        return Response({"error": "Missing order_id or invalid plan."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        capture = paypal_capture_order(order_id)
+        if capture.get("status") != "COMPLETED":
+            return Response({"error": "Payment not completed."}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception:
+        return Response({"error": "Payment capture failed."}, status=status.HTTP_502_BAD_GATEWAY)
+
+    days = REPAIR_PROMOTION_PLANS[plan]["days"]
+    expires = timezone.now() + timedelta(days=days)
+
+    promo, _ = RepairPromotion.objects.update_or_create(
+        shop=shop,
+        defaults={"plan": plan, "expires_at": expires, "is_active": True},
+    )
+    shop.is_featured = True
+    shop.save(update_fields=["is_featured"])
+
+    return Response(RepairPromotionSerializer(promo).data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET", "POST"])

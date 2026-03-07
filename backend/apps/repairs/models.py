@@ -1,7 +1,15 @@
 import uuid
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 from django.utils.text import slugify
+
+
+REPAIR_PROMOTION_PLANS = {
+    "1m": {"label": "1 Month",  "days": 30,  "price": "10"},
+    "3m": {"label": "3 Months", "days": 90,  "price": "25"},
+    "6m": {"label": "6 Months", "days": 180, "price": "45"},
+}
 
 
 class RepairShop(models.Model):
@@ -116,6 +124,30 @@ class RepairShowcase(models.Model):
 
     def __str__(self):
         return f"{self.shop.name} — {self.title}"
+
+
+class RepairPromotion(models.Model):
+    class Plan(models.TextChoices):
+        ONE_MONTH   = "1m", "1 Month"
+        THREE_MONTH = "3m", "3 Months"
+        SIX_MONTH   = "6m", "6 Months"
+
+    id         = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    shop       = models.OneToOneField(RepairShop, on_delete=models.CASCADE, related_name="promotion")
+    plan       = models.CharField(max_length=20, choices=Plan.choices)
+    started_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_active  = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "repair_promotions"
+
+    def __str__(self):
+        return f"{self.shop} — {self.plan}"
+
+    @property
+    def is_expired(self):
+        return timezone.now() > self.expires_at
 
 
 class RepairReview(models.Model):

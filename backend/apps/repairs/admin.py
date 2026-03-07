@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import RepairShop, RepairService, Appointment, RepairReview
+from .models import RepairShop, RepairService, Appointment, RepairReview, RepairPromotion
 
 
 class RepairServiceInline(admin.TabularInline):
@@ -27,3 +27,11 @@ class AppointmentAdmin(admin.ModelAdmin):
 class RepairReviewAdmin(admin.ModelAdmin):
     list_display = ("shop", "author", "rating", "created_at")
     list_filter = ("rating",)
+
+
+@admin.register(RepairPromotion)
+class RepairPromotionAdmin(admin.ModelAdmin):
+    list_display = ("shop", "plan", "started_at", "expires_at", "is_active", "is_expired")
+    list_filter = ("plan", "is_active")
+    search_fields = ("shop__name", "shop__owner__email")
+    readonly_fields = ("id", "started_at", "is_expired")

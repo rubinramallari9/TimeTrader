@@ -63,4 +63,10 @@ export const listingsApi = {
 
   promote: (id: string, plan: PromotionPlan) =>
     api.post<ListingPromotion>(`/listings/${id}/promote/`, { plan }),
+
+  createPayPalOrder: (id: string, plan: PromotionPlan) =>
+    api.post<{ order_id: string }>(`/listings/${id}/promote/create-order/`, { plan }),
+
+  capturePayPalOrder: (id: string, plan: PromotionPlan, orderId: string) =>
+    api.post<ListingPromotion>(`/listings/${id}/promote/capture-order/`, { plan, order_id: orderId }),
 };

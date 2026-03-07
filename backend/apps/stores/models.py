@@ -6,8 +6,9 @@ from django.utils.text import slugify
 
 
 STORE_PROMOTION_PLANS = {
-    "spotlight": {"label": "Spotlight", "days": 30,  "price": "19.99"},
-    "featured":  {"label": "Featured",  "days": 90,  "price": "49.99"},
+    "spotlight": {"label": "1 Month",  "days": 30,  "price": "20"},
+    "featured":  {"label": "3 Months", "days": 90,  "price": "55"},
+    "premium":   {"label": "6 Months", "days": 180, "price": "100"},
 }
 
 
@@ -76,8 +77,9 @@ class StoreImage(models.Model):
 
 class StorePromotion(models.Model):
     class Plan(models.TextChoices):
-        SPOTLIGHT = "spotlight", "Spotlight"
-        FEATURED  = "featured",  "Featured"
+        SPOTLIGHT = "spotlight", "1 Month"
+        FEATURED  = "featured",  "3 Months"
+        PREMIUM   = "premium",   "6 Months"
 
     id         = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     store      = models.OneToOneField(Store, on_delete=models.CASCADE, related_name="promotion")

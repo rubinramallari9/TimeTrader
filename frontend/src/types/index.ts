@@ -52,39 +52,53 @@ export interface PaginatedResponse<T> {
 
 // ── Promotions ────────────────────────────────────────────
 
-export type PromotionPlan = "basic" | "featured" | "premium";
+// Seller listing promotions
+export type DurationKey = "1m" | "3m" | "6m";
+export type AddonKey = "basic" | "extra" | "premium";
+export type PromotionPlan = "1m" | "3m" | "6m";
 
-export interface PromotionPlanInfo {
-  key: PromotionPlan;
+export interface DurationPlan {
+  key: DurationKey;
   label: string;
+  months: number;
   days: number;
-  price: string;
+  price: number;
+}
+
+export interface AddonPlan {
+  key: AddonKey;
+  label: string;
+  prices: Record<DurationKey, number>;
   perks: string[];
 }
 
-export const PROMOTION_PLANS: PromotionPlanInfo[] = [
+export const DURATION_PLANS: DurationPlan[] = [
+  { key: "1m", label: "1 Month",  months: 1, days: 30,  price: 5  },
+  { key: "3m", label: "3 Months", months: 3, days: 90,  price: 13 },
+  { key: "6m", label: "6 Months", months: 6, days: 180, price: 24 },
+];
+
+export const ADDON_PLANS: AddonPlan[] = [
   {
     key: "basic",
-    label: "Basic Boost",
-    days: 7,
-    price: "9.99",
-    perks: ["Highlighted in search results", "Featured badge on listing", "7-day duration"],
+    label: "Basic",
+    prices: { "1m": 0, "3m": 0, "6m": 0 },
+    perks: ["Standard listing placement", "Normal search visibility"],
   },
   {
-    key: "featured",
-    label: "Featured",
-    days: 30,
-    price: "24.99",
-    perks: ["Top placement in search", "Featured badge", "Listed in Featured section", "30-day duration"],
+    key: "extra",
+    label: "Extra",
+    prices: { "1m": 1, "3m": 2, "6m": 3 },
+    perks: ["Highlighted listing card", "Homepage placement", "3-day homepage feature"],
   },
   {
     key: "premium",
     label: "Premium",
-    days: 90,
-    price: "49.99",
-    perks: ["Homepage spotlight", "Priority search placement", "Premium badge", "Social media feature", "90-day duration"],
+    prices: { "1m": 2, "3m": 4, "6m": 6 },
+    perks: ["Pinned to top of search", "Priority placement everywhere", "Premium badge"],
   },
 ];
+
 
 export interface ListingPromotion {
   id: string;
@@ -186,7 +200,7 @@ export interface ConversationDetail extends Conversation {
 
 // ── Store Promotions ───────────────────────────────────────
 
-export type StorePromotionPlan = "spotlight" | "featured";
+export type StorePromotionPlan = "spotlight" | "featured" | "premium";
 
 export interface StorePromotionPlanInfo {
   key: StorePromotionPlan;
@@ -199,23 +213,75 @@ export interface StorePromotionPlanInfo {
 export const STORE_PROMOTION_PLANS: StorePromotionPlanInfo[] = [
   {
     key: "spotlight",
-    label: "Spotlight",
+    label: "1 Month",
     days: 30,
-    price: "19.99",
+    price: "20",
     perks: ["Featured badge in directory", "Higher placement in search", "30-day duration"],
   },
   {
     key: "featured",
-    label: "Featured",
+    label: "3 Months",
     days: 90,
-    price: "49.99",
+    price: "55",
     perks: ["Top placement in directory", "Featured badge + homepage exposure", "Priority search ranking", "90-day duration"],
+  },
+  {
+    key: "premium",
+    label: "6 Months",
+    days: 180,
+    price: "100",
+    perks: ["Maximum visibility in directory", "Homepage spotlight", "Priority badge everywhere", "180-day duration"],
+  },
+];
+
+// Repair shop promotion plans
+export type RepairPromotionPlan = "1m" | "3m" | "6m";
+
+export interface RepairPromotionPlanInfo {
+  key: RepairPromotionPlan;
+  label: string;
+  days: number;
+  price: string;
+  perks: string[];
+}
+
+export const REPAIR_PROMOTION_PLANS: RepairPromotionPlanInfo[] = [
+  {
+    key: "1m",
+    label: "1 Month",
+    days: 30,
+    price: "10",
+    perks: ["Listed in repair directory", "Shop profile highlighted", "30-day duration"],
+  },
+  {
+    key: "3m",
+    label: "3 Months",
+    days: 90,
+    price: "25",
+    perks: ["Priority placement in search", "Featured badge on profile", "90-day duration"],
+  },
+  {
+    key: "6m",
+    label: "6 Months",
+    days: 180,
+    price: "45",
+    perks: ["Top of directory listing", "Homepage exposure", "Priority badge", "180-day duration"],
   },
 ];
 
 export interface StorePromotion {
   id: string;
   plan: StorePromotionPlan;
+  plan_label: string;
+  started_at: string;
+  expires_at: string;
+  is_active: boolean;
+  is_expired: boolean;
+}
+
+export interface RepairPromotion {
+  id: string;
+  plan: RepairPromotionPlan;
   plan_label: string;
   started_at: string;
   expires_at: string;

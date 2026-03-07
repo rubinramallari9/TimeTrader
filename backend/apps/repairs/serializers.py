@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import RepairShop, RepairService, Appointment, RepairReview, RepairShowcase
+from .models import RepairShop, RepairService, Appointment, RepairReview, RepairShowcase, RepairPromotion, REPAIR_PROMOTION_PLANS
 from apps.users.serializers import UserPublicSerializer
 
 
@@ -117,6 +117,18 @@ class RepairShowcaseWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = RepairShowcase
         fields = ("title", "description", "before_image", "after_image", "watch_brand", "watch_model")
+
+
+class RepairPromotionSerializer(serializers.ModelSerializer):
+    is_expired = serializers.BooleanField(read_only=True)
+    plan_label = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RepairPromotion
+        fields = ("id", "plan", "plan_label", "started_at", "expires_at", "is_active", "is_expired")
+
+    def get_plan_label(self, obj):
+        return REPAIR_PROMOTION_PLANS.get(obj.plan, {}).get("label", obj.plan)
 
 
 class AppointmentSerializer(serializers.ModelSerializer):

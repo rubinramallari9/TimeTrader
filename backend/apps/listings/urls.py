@@ -10,4 +10,6 @@ urlpatterns = [
     path("<uuid:listing_id>/images/<uuid:image_id>/", views.delete_listing_image, name="listing-image-delete"),
     path("<uuid:listing_id>/save/", views.toggle_save, name="listing-save"),
     path("<uuid:listing_id>/promote/", views.promote_listing, name="listing-promote"),
+    path("<uuid:listing_id>/promote/create-order/", views.listing_promote_create_order, name="listing-promote-create-order"),
+    path("<uuid:listing_id>/promote/capture-order/", views.listing_promote_capture_order, name="listing-promote-capture-order"),
 ]

@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { RepairShopCard, RepairShopDetail, RepairService, RepairShowcase, Appointment, Review, PaginatedResponse } from "@/types";
+import { RepairShopCard, RepairShopDetail, RepairService, RepairShowcase, RepairPromotion, RepairPromotionPlan, Appointment, Review, PaginatedResponse } from "@/types";
 
 export const repairsApi = {
   list: (params?: { search?: string; city?: string; country?: string; featured?: boolean; page?: number }) =>
@@ -57,6 +57,18 @@ export const repairsApi = {
 
   deleteShowcase: (slug: string, itemId: string) =>
     api.delete(`/repairs/${slug}/showcase/${itemId}/`),
+
+  getPromotion: (slug: string) =>
+    api.get<RepairPromotion | null>(`/repairs/${slug}/promote/`),
+
+  promote: (slug: string, plan: RepairPromotionPlan) =>
+    api.post<RepairPromotion>(`/repairs/${slug}/promote/`, { plan }),
+
+  createPayPalOrder: (slug: string, plan: RepairPromotionPlan) =>
+    api.post<{ order_id: string }>(`/repairs/${slug}/promote/create-order/`, { plan }),
+
+  capturePayPalOrder: (slug: string, plan: RepairPromotionPlan, orderId: string) =>
+    api.post<RepairPromotion>(`/repairs/${slug}/promote/capture-order/`, { plan, order_id: orderId }),
 
   uploadLogo: (file: File) => {
     const fd = new FormData();

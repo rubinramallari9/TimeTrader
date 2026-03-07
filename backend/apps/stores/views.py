@@ -10,6 +10,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 from .models import Store, StoreImage, StorePromotion, Review, STORE_PROMOTION_PLANS
+from config.paypal_utils import create_order as paypal_create_order, capture_order as paypal_capture_order
 from .serializers import (
     StoreCardSerializer, StoreDetailSerializer, StorePromotionSerializer,
     CreateUpdateStoreSerializer, ReviewSerializer, CreateReviewSerializer,
@@ -163,6 +164,62 @@ def store_promote(request, slug):
     store.save(update_fields=["is_featured"])
 
     return Response(StorePromotionSerializer(promo).data, status=status.HTTP_201_CREATED)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def store_promote_create_order(request, slug):
+    try:
+        store = Store.objects.get(slug=slug, owner=request.user)
+    except Store.DoesNotExist:
+        return Response({"error": "Store not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    plan = request.data.get("plan")
+    if plan not in STORE_PROMOTION_PLANS:
+        return Response({"error": "Invalid plan."}, status=status.HTTP_400_BAD_REQUEST)
+
+    price = STORE_PROMOTION_PLANS[plan]["price"]
+    description = f"{store.name} — {STORE_PROMOTION_PLANS[plan]['label']} Store Promotion"
+
+    try:
+        order = paypal_create_order(price, description)
+        return Response({"order_id": order["id"]})
+    except Exception:
+        return Response({"error": "Failed to create payment order."}, status=status.HTTP_502_BAD_GATEWAY)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def store_promote_capture_order(request, slug):
+    try:
+        store = Store.objects.get(slug=slug, owner=request.user)
+    except Store.DoesNotExist:
+        return Response({"error": "Store not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    order_id = request.data.get("order_id")
+    plan = request.data.get("plan")
+
+    if not order_id or plan not in STORE_PROMOTION_PLANS:
+        return Response({"error": "Missing order_id or invalid plan."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        capture = paypal_capture_order(order_id)
+        if capture.get("status") != "COMPLETED":
+            return Response({"error": "Payment not completed."}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception:
+        return Response({"error": "Payment capture failed."}, status=status.HTTP_502_BAD_GATEWAY)
+
+    days = STORE_PROMOTION_PLANS[plan]["days"]
+    expires = timezone.now() + timedelta(days=days)
+
+    promo, _ = StorePromotion.objects.update_or_create(
+        store=store,
+        defaults={"plan": plan, "expires_at": expires, "is_active": True},
+    )
+    store.is_featured = True
+    store.save(update_fields=["is_featured"])
+
+    return Response(StorePromotionSerializer(promo).data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET", "POST"])

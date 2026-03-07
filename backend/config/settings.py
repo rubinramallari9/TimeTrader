@@ -171,6 +171,11 @@ else:
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# PayPal
+PAYPAL_CLIENT_ID     = os.environ.get("PAYPAL_CLIENT_ID", "")
+PAYPAL_CLIENT_SECRET = os.environ.get("PAYPAL_CLIENT_SECRET", "")
+PAYPAL_MODE          = os.environ.get("PAYPAL_MODE", "sandbox")  # "sandbox" or "live"
+
 # Third-party API keys
 
 # Internationalization

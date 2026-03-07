@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Listing, ListingImage, SavedListing
+from .models import Listing, ListingImage, SavedListing, ListingPromotion
 
 
 class ListingImageInline(admin.TabularInline):
@@ -22,3 +22,11 @@ class ListingAdmin(admin.ModelAdmin):
 class SavedListingAdmin(admin.ModelAdmin):
     list_display = ("user", "listing", "created_at")
     readonly_fields = ("id", "created_at")
+
+
+@admin.register(ListingPromotion)
+class ListingPromotionAdmin(admin.ModelAdmin):
+    list_display = ("listing", "plan", "started_at", "expires_at", "is_active", "is_expired")
+    list_filter = ("plan", "is_active")
+    search_fields = ("listing__title", "listing__seller__email")
+    readonly_fields = ("id", "started_at", "is_expired")

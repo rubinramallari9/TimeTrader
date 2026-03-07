@@ -34,6 +34,12 @@ export const storesApi = {
   promote: (slug: string, plan: StorePromotionPlan) =>
     api.post<StorePromotion>(`/stores/${slug}/promote/`, { plan }),
 
+  createPayPalOrder: (slug: string, plan: StorePromotionPlan) =>
+    api.post<{ order_id: string }>(`/stores/${slug}/promote/create-order/`, { plan }),
+
+  capturePayPalOrder: (slug: string, plan: StorePromotionPlan, orderId: string) =>
+    api.post<StorePromotion>(`/stores/${slug}/promote/capture-order/`, { plan, order_id: orderId }),
+
   getReviews: (slug: string, page = 1) =>
     api.get<PaginatedResponse<Review>>(`/stores/${slug}/reviews/`, { params: { page } }),
 

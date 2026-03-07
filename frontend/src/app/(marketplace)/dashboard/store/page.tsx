@@ -4,8 +4,9 @@ import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { StoreDetail, StorePromotion, MyListing, STORE_PROMOTION_PLANS } from "@/types";
+import { StoreDetail, StorePromotion, StorePromotionPlan, MyListing, STORE_PROMOTION_PLANS } from "@/types";
 import { storesApi } from "@/lib/stores-api";
+
 import { listingsApi } from "@/lib/listings-api";
 import { useAuthStore } from "@/store/auth";
 import StarRating from "@/components/shared/StarRating";
@@ -29,7 +30,7 @@ export default function StoreDashboard() {
   const [loading, setLoading]       = useState(true);
   const [tab, setTab]               = useState<Tab>("overview");
   const [activatingPlan, setActivatingPlan] = useState<string | null>(null);
-  const [promoSuccess, setPromoSuccess]     = useState(false);
+  const [promoSuccess, setPromoSuccess] = useState(false);
   const [deleteTarget, setDeleteTarget]     = useState<MyListing | null>(null);
   const [deleting, setDeleting]             = useState(false);
   const [markingId, setMarkingId]           = useState<string | null>(null);
@@ -72,18 +73,6 @@ export default function StoreDashboard() {
     }
   };
 
-  const handleActivatePlan = async (plan: string) => {
-    if (!store || activatingPlan) return;
-    setActivatingPlan(plan);
-    try {
-      const { data } = await storesApi.promote(store.slug, plan as "spotlight" | "featured");
-      setPromo(data);
-      setPromoSuccess(true);
-      setTimeout(() => setPromoSuccess(false), 4000);
-    } finally {
-      setActivatingPlan(null);
-    }
-  };
 
   const handleMarkSold = async (id: string) => {
     if (markingId) return;
@@ -113,6 +102,19 @@ export default function StoreDashboard() {
     if (!file) return;
     setLogoFile(file);
     setLogoPreview(URL.createObjectURL(file));
+  };
+
+  const handleActivatePlan = async (plan: string) => {
+    if (!store || activatingPlan) return;
+    setActivatingPlan(plan);
+    try {
+      const { data } = await storesApi.promote(store.slug, plan as StorePromotionPlan);
+      setPromo(data);
+      setPromoSuccess(true);
+      setTimeout(() => setPromoSuccess(false), 4000);
+    } finally {
+      setActivatingPlan(null);
+    }
   };
 
   const handleSaveSettings = async (e: React.FormEvent) => {
@@ -357,17 +359,6 @@ export default function StoreDashboard() {
       {/* ── Advertise ─────────────────────────────────────── */}
       {tab === "advertise" && (
         <div>
-          {/* Beta banner */}
-          <div className="bg-[#B09145]/10 border border-[#B09145]/25 rounded-2xl px-5 py-4 mb-6 flex items-center gap-3">
-            <svg className="w-5 h-5 text-[#B09145] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-            </svg>
-            <div>
-              <p className="text-sm font-semibold text-[#B09145]">Beta — All plans are free during launch</p>
-              <p className="text-xs text-[#9E9585]">Get your store featured now, pricing will apply after launch.</p>
-            </div>
-          </div>
-
           {promoSuccess && (
             <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-5 py-3 mb-6 text-sm font-medium">
               Store promotion activated. Your store is now featured in the directory.
@@ -384,33 +375,31 @@ export default function StoreDashboard() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {STORE_PROMOTION_PLANS.map((plan) => {
-              const isCurrent = promoActive && promo!.plan === plan.key;
+              const isCurrent = !!(promoActive && promo!.plan === plan.key);
               return (
-                <div key={plan.key} className={`bg-white border rounded-2xl p-6 flex flex-col ${isCurrent ? "border-[#B09145] ring-1 ring-[#B09145]/30" : "border-[#EDE9E3]"}`}>
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <p className="font-bold text-lg text-[#0E1520]">{plan.label}</p>
-                      <p className="text-[10px] font-semibold tracking-widest uppercase text-[#9E9585]">{plan.days}-day promotion</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs line-through text-[#C8C0B0]">${plan.price}</p>
-                      <p className="text-sm font-bold text-[#B09145]">Free</p>
-                    </div>
+                <div key={plan.key} className={`relative bg-white border rounded-2xl p-5 flex flex-col ${isCurrent ? "border-[#B09145] ring-1 ring-[#B09145]/30" : "border-[#EDE9E3]"}`}>
+                  {plan.key === "featured" && (
+                    <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-[#B09145] text-white text-[9px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-full whitespace-nowrap">
+                      Best Value
+                    </span>
+                  )}
+                  <div className="mb-3">
+                    <p className="text-xs font-bold text-[#9E9585] mb-1">{plan.label}</p>
+                    <p className="text-2xl font-bold text-[#0E1520]">{plan.price}€</p>
+                    <p className="text-[10px] text-[#9E9585] mt-0.5">{plan.days} days</p>
                   </div>
-
                   <ul className="space-y-1.5 mb-5 flex-1">
                     {plan.perks.map((perk) => (
-                      <li key={perk} className="flex items-center gap-2 text-xs text-[#9E9585]">
-                        <svg className="w-3.5 h-3.5 text-[#B09145] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      <li key={perk} className="flex items-start gap-1.5 text-[11px] text-[#4A5568]">
+                        <svg className="w-3.5 h-3.5 text-[#B09145] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                         {perk}
                       </li>
                     ))}
                   </ul>
-
                   <button
                     onClick={() => handleActivatePlan(plan.key)}
                     disabled={!!activatingPlan || isCurrent}
@@ -420,7 +409,7 @@ export default function StoreDashboard() {
                         : "tt-btn-gold hover:opacity-90 disabled:opacity-50"
                     }`}
                   >
-                    {isCurrent ? "Current Plan" : activatingPlan === plan.key ? "Activating…" : "Activate Free"}
+                    {isCurrent ? "Current Plan" : activatingPlan === plan.key ? "Activating…" : "Activate"}
                   </button>
                 </div>
               );

@@ -8,5 +8,7 @@ urlpatterns = [
     path("<slug:slug>/logo/", views.upload_store_logo, name="store-logo"),
     path("<slug:slug>/listings/", views.store_listings, name="store-listings"),
     path("<slug:slug>/promote/", views.store_promote, name="store-promote"),
+    path("<slug:slug>/promote/create-order/", views.store_promote_create_order, name="store-promote-create-order"),
+    path("<slug:slug>/promote/capture-order/", views.store_promote_capture_order, name="store-promote-capture-order"),
     path("<slug:slug>/reviews/", views.store_reviews, name="store-reviews"),
 ]

@@ -89,17 +89,17 @@ class ListingImage(models.Model):
 
 
 PROMOTION_PLANS = {
-    "basic":    {"label": "Basic",    "days": 7,  "price": "9.99"},
-    "featured": {"label": "Featured", "days": 30, "price": "24.99"},
-    "premium":  {"label": "Premium",  "days": 90, "price": "49.99"},
+    "1m": {"label": "1 Month",  "days": 30,  "price": "5"},
+    "3m": {"label": "3 Months", "days": 90,  "price": "13"},
+    "6m": {"label": "6 Months", "days": 180, "price": "24"},
 }
 
 
 class ListingPromotion(models.Model):
     class Plan(models.TextChoices):
-        BASIC    = "basic",    "Basic"
-        FEATURED = "featured", "Featured"
-        PREMIUM  = "premium",  "Premium"
+        ONE_MONTH   = "1m", "1 Month"
+        THREE_MONTH = "3m", "3 Months"
+        SIX_MONTH   = "6m", "6 Months"
 
     id         = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     listing    = models.OneToOneField(Listing, on_delete=models.CASCADE, related_name="promotion")
