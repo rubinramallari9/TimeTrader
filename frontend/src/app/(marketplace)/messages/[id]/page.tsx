@@ -67,7 +67,7 @@ export default function ConversationPage() {
     if (conv && user) {
       const optimistic: Message = {
         id: `temp-${Date.now()}`,
-        sender: { id: user.id, username: user.username, full_name: user.username, avatar_url: "", role: user.role, is_verified: false, created_at: "" },
+        sender: { id: user.id, username: user.username, full_name: user.username, avatar_url: "", role: user.role, is_verified: false, created_at: "", phone: "" },
         content: text,
         is_read: false,
         created_at: new Date().toISOString(),
