@@ -53,6 +53,7 @@ export default function Navbar() {
 
   return (
     <header
+      suppressHydrationWarning
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
           ? "bg-[#0E1520]/95 backdrop-blur-md shadow-lg shadow-black/20"
@@ -64,9 +65,6 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-2 group">
           <span className="font-display italic text-2xl text-white tracking-tight group-hover:text-[#C8A96E] transition-colors">
             TimeTrader
-          </span>
-          <span className="hidden sm:block text-[10px] font-semibold tracking-[0.15em] uppercase text-[#B09145] mt-1">
-            Luxury Watches
           </span>
         </Link>
 
@@ -88,7 +86,7 @@ export default function Navbar() {
         </nav>
 
         {/* Right actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3" suppressHydrationWarning>
           {user ? (
             <>
               {(user.role === "seller" || user.role === "store" || user.role === "admin") && (
