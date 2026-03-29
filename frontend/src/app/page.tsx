@@ -102,11 +102,11 @@ export default function HomePage() {
                 </button>
               </form>
 
-              <div className="flex flex-wrap gap-3">
-                <Link href="/listings" className="tt-btn-gold py-3 rounded-xl text-sm text-center w-44">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link href="/listings" className="tt-btn-gold py-3 rounded-xl text-sm text-center w-full sm:w-44">
                   Browse Watches
                 </Link>
-                <Link href="/sell" className="tt-btn-ghost py-3 rounded-xl text-sm text-center w-44">
+                <Link href="/sell" className="tt-btn-ghost py-3 rounded-xl text-sm text-center w-full sm:w-44">
                   List Your Watch
                 </Link>
               </div>
@@ -281,11 +281,11 @@ export default function HomePage() {
               List in minutes. Reach thousands of serious collectors worldwide. Verified sellers, direct messaging, and a community that takes watches seriously.
             </p>
           </div>
-          <div className="flex gap-3 flex-shrink-0">
-            <Link href="/sell" className="tt-btn-gold py-3 px-7 rounded-xl text-sm whitespace-nowrap">
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <Link href="/sell" className="tt-btn-gold py-3 px-7 rounded-xl text-sm text-center whitespace-nowrap">
               Start Selling
             </Link>
-            <Link href="/register" className="tt-btn-ghost py-3 px-7 rounded-xl text-sm whitespace-nowrap">
+            <Link href="/register" className="tt-btn-ghost py-3 px-7 rounded-xl text-sm text-center whitespace-nowrap">
               Create Account
             </Link>
           </div>
